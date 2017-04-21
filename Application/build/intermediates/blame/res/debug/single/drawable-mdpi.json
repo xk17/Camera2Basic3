@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/res/merged/debug/drawable-mdpi/ic_action_info.png",
+        "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/src/main/res/drawable-mdpi/ic_action_info.png"
+    },
+    {
+        "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/res/merged/debug/drawable-mdpi/ic_launcher.png",
+        "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/src/main/res/drawable-mdpi/ic_launcher.png"
+    }
+]
