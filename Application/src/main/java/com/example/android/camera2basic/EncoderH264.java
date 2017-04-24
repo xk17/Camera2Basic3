@@ -1,6 +1,8 @@
 package com.example.android.camera2basic;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.Fragment;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.media.Image;
@@ -11,12 +13,15 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.example.android.camera2basic.CameraActivity;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by xuke on 2017/4/20.
@@ -24,9 +29,8 @@ import java.nio.ByteBuffer;
 
 public class EncoderH264 {
     private final static String TAG = "MeidaCodec";
-
-    private int TIMEOUT_USEC = 12000;
-
+    private Quene queue;
+    private int TIMEOUT_USEC = 20000;
 
     private MediaCodec mediaCodec;
     int m_width;
@@ -38,7 +42,10 @@ public class EncoderH264 {
 
     public byte[] HeadInfo;
 
+    byte tstBte = 0;
+
     public EncoderH264(int imageW, int imageH,int framerate){
+        queue = CameraActivity.quene;
         m_width = imageW;
         m_height = imageH;
         Log.d(TAG, "输入编码器数据宽" + imageW + "高" +imageH);
@@ -46,8 +53,8 @@ public class EncoderH264 {
 
         MediaFormat mediaFormat = MediaFormat.createVideoFormat("video/avc", imageW, imageH);
         mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
-        mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, imageW * imageH * 3);
-        mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, 30);
+        mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, imageW * imageH * 5);
+        mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, 24);
         mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
         try {
             mediaCodec = MediaCodec.createEncoderByType("video/avc");
@@ -62,95 +69,112 @@ public class EncoderH264 {
 
     long pts = 0;
     long generateIndex = 0;
+//    public void StartEncoderThread(Image image){
+//        Thread EncoderThread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                //long startMs = System.currentTimeMillis();
+      public synchronized void code(Image image){
+          if (queue.getH264SendQueue() == null){
+              //sendQuene = new Quene();
+          }
+            YUV_888To420(image);
+//          tstBte+=1;
 
-    public void code(Image image) {
-        //long startMs = System.currentTimeMillis();
-
-        YUV_888To420(image);
-
-        ByteBuffer[] inputBuffers = mediaCodec.getInputBuffers();
-        ByteBuffer[] outputBuffers = mediaCodec.getOutputBuffers();
 
 
-        ////获取可用的inputBuffer -1代表一直等待，0表示不等待 建议-1,避免丢帧
-        int inputBufferId = mediaCodec.dequeueInputBuffer(10000);
-        if (inputBufferId >= 0) {
+            ByteBuffer[] inputBuffers = mediaCodec.getInputBuffers();
+            ByteBuffer[] outputBuffers = mediaCodec.getOutputBuffers();
+
+
+            ////获取可用的inputBuffer -1代表一直等待，0表示不等待 建议-1,避免丢帧
+            int inputBufferId = mediaCodec.dequeueInputBuffer(-1);
+            if (inputBufferId >= 0) {
 //            ByteBuffer inputBuffer = mediaCodec.getInputBuffer(inputBufferId);
-            pts = computePresentationTime(generateIndex);
-            ByteBuffer inputBuffer = inputBuffers[inputBufferId];
-            // fill inputBuffer with valid data
-            inputBuffer.put(data);
-            Log.d(TAG, "放入的data" + data);
-            mediaCodec.queueInputBuffer(inputBufferId, 0, data.length, pts, 0);
-            generateIndex += 1;
-            Log.d(TAG, "放入数据成功");
-        }
-        //执行上面的操作后就把待编解码的数据存入了输入缓冲区，然后下一步就是操作然后把编解码的数据存入输出缓冲区
-        MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
+                pts = computePresentationTime(generateIndex);
+                ByteBuffer inputBuffer = inputBuffers[inputBufferId];
+                // fill inputBuffer with valid data
+//                test用例
+//                inputBuffer.put(tstBte);
+//                Log.d(TAG, "放入的data" + tstBte);
+                inputBuffer.put(data);
+                Log.d(TAG, "放入的data" + data);
+//                mediaCodec.queueInputBuffer(inputBufferId, 0, 1, pts, 0);
+                mediaCodec.queueInputBuffer(inputBufferId, 0, data.length, pts, 0);
 
-        int outputBufferId = mediaCodec.dequeueOutputBuffer(bufferInfo, TIMEOUT_USEC);
-        Log.d(TAG, "outputBufferId "+outputBufferId);
-        switch (outputBufferId) {
-            case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED://当buffer变化时，client必须重新指向新的buffer
-                Log.d(TAG, ">> output buffer changed ");
-                outputBuffers = mediaCodec.getOutputBuffers();
-                break;
-            case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED://当buffer的封装格式变化,须指向新的buffer格式
-                Log.d(TAG, ">> buffer的封装格式变化output buffer changed ");
-                break;
-            case MediaCodec.INFO_TRY_AGAIN_LATER://当dequeueOutputBuffer超时,会到达此case
-                Log.d(TAG, ">> dequeueOutputBuffer timeout超时 ");
-                break;
-            default:
+                generateIndex += 1;
+                Log.d(TAG, "放入数据成功");
+            }
+            //执行上面的操作后就把待编解码的数据存入了输入缓冲区，然后下一步就是操作然后把编解码的数据存入输出缓冲区
+            MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
+
+            int outputBufferId = mediaCodec.dequeueOutputBuffer(bufferInfo, TIMEOUT_USEC);
+            Log.d(TAG, "outputBufferId "+outputBufferId);
+            switch (outputBufferId) {
+                case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED://当buffer变化时，client必须重新指向新的buffer
+                    Log.d(TAG, ">> output buffer changed ");
+                    outputBuffers = mediaCodec.getOutputBuffers();
+                    break;
+                case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED://当buffer的封装格式变化,须指向新的buffer格式
+                    Log.d(TAG, ">> buffer的封装格式变化output buffer changed ");
+                    break;
+                case MediaCodec.INFO_TRY_AGAIN_LATER://当dequeueOutputBuffer超时,会到达此case
+                    Log.d(TAG, ">> dequeueOutputBuffer timeout超时 ");
+                    break;
+                default:
 //                ByteBuffer outputBuffer = mediaCodec.getOutputBuffer(outputBufferId);
-                ByteBuffer outputBuffer = outputBuffers[outputBufferId];
-                MediaFormat bufferFormat = mediaCodec.getOutputFormat(outputBufferId); // option A
-                // bufferFormat is identical to outputFormat
-                // outputBuffer is ready to be processed or rendered.
-                //outputBuffer.slice();
-                byte[] outData = new byte[bufferInfo.size];
-                outputBuffer.get(outData);
-                //deal key frame v3.0
-                if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_CODEC_CONFIG) {
-                    //startSendH264 frame
-                    HeadInfo = new byte[outData.length];
-                    HeadInfo = outData;
-                    Log.d(TAG, "head");
-                } else if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_KEY_FRAME) {
-                    //key frame
-                    byte[] key = new byte[outData.length + HeadInfo.length];
-                    //param: src srcpos dec decpos length
-                    System.arraycopy(HeadInfo, 0, key, 0, HeadInfo.length);
-                    System.arraycopy(outData, 0, key, HeadInfo.length, outData.length);
-                    //version 1.0
-                    //write key frame to h264
-                    try {
-                        outputStream.write(key, 0, key.length);
-                    } catch (IOException e) {
+                    ByteBuffer outputBuffer = outputBuffers[outputBufferId];
+                    MediaFormat bufferFormat = mediaCodec.getOutputFormat(outputBufferId); // option A
+                    // bufferFormat is identical to outputFormat
+                    // outputBuffer is ready to be processed or rendered.
+                    //outputBuffer.slice();
+                    byte[] outData = new byte[bufferInfo.size];
+                    outputBuffer.get(outData);
+                    //deal key frame v3.0
+                    if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_CODEC_CONFIG) {
+                        //startSendH264 frame
+                        HeadInfo = new byte[outData.length];
+                        HeadInfo = outData;
+                        Log.d(TAG, "head");
+                    } else if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_KEY_FRAME) {
+                        //key frame
+                        byte[] key = new byte[outData.length + HeadInfo.length];
+                        //param: src srcpos dec decpos length
+                        System.arraycopy(HeadInfo, 0, key, 0, HeadInfo.length);
+                        System.arraycopy(outData, 0, key, HeadInfo.length, outData.length);
+                        //version 1.0
+                        //write key frame to h264
+                        try {
+                            outputStream.write(key, 0, key.length);
+                        } catch (IOException e) {
+                        }
+                        queue.offerSendH264Queue(key);
+                        Log.d(TAG, "key");
+                        //put key frame to queue
+                    } else if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_END_OF_STREAM) {
+                        //end frame
+                        Log.d(TAG, "end");
+                    } else {
+                        try {
+                            outputStream.write(outData, 0, outData.length);
+                        } catch (IOException e) {
+                        }
+                        queue.offerSendH264Queue(outData);
+                        Log.d(TAG, "normal");
                     }
-                    Log.d(TAG, "key");
-                    //put key frame to queue
-                } else if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_END_OF_STREAM) {
-                    //end frame
-                    Log.d(TAG, "end");
-                } else {
-                    try {
-                        outputStream.write(outData, 0, outData.length);
-                    } catch (IOException e) {
-                    }
-                    Log.d(TAG, "normal");
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                mediaCodec.releaseOutputBuffer(outputBufferId, false);
-                image.close();
-                break;
-        }
-    }
+//                        try {
+//                            Thread.sleep(100);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+                    mediaCodec.releaseOutputBuffer(outputBufferId, false);
+                    image.close();
+                    break;
 
+            }
+
+ //       });
+      }
 
     private void StopEncoder() {
         try {
@@ -182,7 +206,7 @@ public class EncoderH264 {
      * Generates the presentation time for frame N, in microseconds.
      */
     private long computePresentationTime(long frameIndex) {
-        return 132 + frameIndex * 1000000 / m_framerate;
+        return 132 + frameIndex * 1000000/ m_framerate;
     }
 
 

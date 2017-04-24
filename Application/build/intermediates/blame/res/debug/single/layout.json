@@ -36,6 +36,10 @@
         "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/layout/abc_screen_content_include.xml"
     },
     {
+        "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/res/merged/debug/layout/fragment_video_show.xml",
+        "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/src/main/res/layout/fragment_video_show.xml"
+    },
+    {
         "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/res/merged/debug/layout/abc_list_menu_item_icon.xml",
         "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/layout/abc_list_menu_item_icon.xml"
     },
