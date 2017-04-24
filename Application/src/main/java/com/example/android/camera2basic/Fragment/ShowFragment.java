@@ -139,17 +139,18 @@ public class ShowFragment extends Fragment {
                         byte[] b = quene.getOneNalu();
                         if (b!=null){
                             byteBuffer.put(b);
-                            Log.d(TAG, "解码器输入数据");
-                            mPlayCodec.queueInputBuffer(inIndex, 0, b.length, 100, 0);
+                            Log.d(TAG, "解码器输入数据"+b);
+                            mPlayCodec.queueInputBuffer(inIndex, 0, b.length, pts, 0);
 //                            mPlayCodec.queueInputBuffer(inIndex, 0, 1, pts, 0);
                             generateIndex += 1;
                         }else{
                             byte[] dummyFrame = new byte[]{0x00, 0x00, 0x01, 0x20};
                             byteBuffer.put(dummyFrame);
-                            mPlayCodec.queueInputBuffer(inIndex, 0, dummyFrame.length, 100, 0);
+                            mPlayCodec.queueInputBuffer(inIndex, 0, dummyFrame.length, pts, 0);
                             generateIndex += 1;
                         }
                     }
+
 
                     int outIndex = mPlayCodec.dequeueOutputBuffer(info, timeoutUs);
 //                    if (outIndex<0){
@@ -158,11 +159,15 @@ public class ShowFragment extends Fragment {
 //                    }
                     Log.d(TAG, "outIndex"+outIndex);
                     if (outIndex >= 0) {
-//                        ByteBuffer outputBuffer = mPlayCodec.getOutputBuffer(outIndex);
-//                        outputBuffer.position(info.offset);
-//                        outputBuffer.limit(info.offset + info.size);
-//                        Log.d(TAG,"length"+info.offset + info.size);
-//                        Log.d(TAG, "输出数据："+info.toString());
+                        ByteBuffer outputBuffer = mPlayCodec.getOutputBuffer(outIndex);
+                        outputBuffer.position(info.offset);
+                        outputBuffer.limit(info.offset + info.size);
+                        Log.d(TAG,"length"+info.offset + info.size);
+                        Log.d(TAG, "输出数据："+info.toString());
+
+
+//                        outputBuffer.get(outData);
+
 
                         boolean doRender = (info.size != 0);
                         mPlayCodec.releaseOutputBuffer(outIndex, doRender);
