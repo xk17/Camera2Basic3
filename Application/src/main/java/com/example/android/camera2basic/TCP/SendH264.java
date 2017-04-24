@@ -47,7 +47,7 @@ public class SendH264 {
         public void connectToBox(){
             try{
                 send = new Socket("10.1.1.1",8888);
-                Log.d("qqqqqqqqqqq","success");
+                Log.d("qqqq","success");
 //                send = new Socket("10.1.1.1",8888);//obu
                 sendStream = send.getOutputStream();
             }catch (IOException e){
@@ -61,7 +61,7 @@ public class SendH264 {
 //                send = new Socket("10.1.1.1",8888);//obu
                 sendStream = send.getOutputStream();
             }catch (IOException e){
-                Log.d("qqqqqqqqqqqqqqqqqqqqqqq","worong");
+                Log.d("qqqqqqqqqqqqqqqqqqqqqqq","wrong");
             }
         }
 
@@ -72,12 +72,11 @@ public class SendH264 {
                 send = new Socket("10.1.1.1",8888);
 //                send = new Socket("10.105.36.224",18888);
                 Log.d(TAG,"success");
-//                send = new Socket("10.1.1.1",8888);//obu
                 sendStream = send.getOutputStream();
             }catch (IOException e){
                 Log.d(TAG,"worong");
             }
-
+            int number = 1;
             while(true){
                 Log.d(TAG, "发送队列"+quene.getH264SendQueue());
                 if (!quene.getH264SendQueue().isEmpty()){
@@ -86,20 +85,35 @@ public class SendH264 {
                     try{
                         //maybe wrong
                         byte[] tmp = (byte[])quene.getH264SendQueue().poll();
+                        byte[] total = new byte[tmp.length+4];
+
+                        System.arraycopy(intToByteArray(number),0,total,0,4);
+                        System.arraycopy(tmp,0,total,4,tmp.length);
                         if (sendStream != null){
 //                            sendStream.write(b);
-                            sendStream.write(tmp);
+//                            sendStream.write(number);
+//                            sendStream.write(tmp);
+                            sendStream.write(total);
+                            Log.d(TAG, "包序号："+number);
                             sendStream.flush();
+                            number +=1;
                         }
                     }catch (IOException e){}
                 }
-                try {
-                    Thread.sleep(10);
-                }catch (InterruptedException e){}
+//                try {
+//                    Thread.sleep(10);
+//                }catch (InterruptedException e){}
             }
         }
     }
-
+    public static byte[] intToByteArray(int a) {
+        return new byte[] {
+                (byte) ((a >> 24) & 0xFF),
+                (byte) ((a >> 16) & 0xFF),
+                (byte) ((a >> 8) & 0xFF),
+                (byte) (a & 0xFF)
+        };
+    }
 
 }
 
