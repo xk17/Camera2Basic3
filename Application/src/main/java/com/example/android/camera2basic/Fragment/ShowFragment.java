@@ -276,9 +276,6 @@ public class ShowFragment extends Fragment {
         }
 
 
-
-    }
-
     private byte[] currentBuff = new byte[102400];
     private int currentBuffStart = 0;//valid data start
     private int currentBuffEnd = 0;

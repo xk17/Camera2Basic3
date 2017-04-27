@@ -1,5 +1,5 @@
 #Internal package file, do not edit.
-#Thu Apr 27 20:54:17 CST 2017
+#Thu Apr 27 21:19:31 CST 2017
 175.set=ANDROID_RESOURCE
 122.file=/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/res/resources-debug.ap_/res/drawable-hdpi-v4/abc_menu_hardkey_panel_mtrl_mult.9.png
 60.set=ANDROID_RESOURCE
