@@ -85,7 +85,7 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
      */
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static final int REQUEST_CAMERA_PERMISSION = 1;
-    private static final String FRAGMENT_DIALOG = "dialog";
+
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -244,7 +244,7 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
 //----------------------4.19-----------------------------------------------------------
 
     private EncoderH264 mH264Encode = null;
-    private int framerate = 20;
+    private int framerate = 24;
     public int ImageWidth = 0;
     public int ImageHeight = 0;
 
@@ -263,7 +263,7 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
             Image image = reader.acquireNextImage();
             ImageHeight = image.getHeight();
             ImageWidth = image.getWidth();
-            Log.d(TAG, "通过image剪裁后高"+ImageHeight + "宽"+ImageWidth);
+            Log.d(TAG, "通过image剪裁后高"+ImageHeight + "宽"+ImageWidth+""+image.getFormat());
             if (isRecord == true){
                     mH264Encode.code(image);
                     Log.d(TAG, "image数据输入编码器中" + image);
@@ -272,14 +272,6 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
             }
         }
     };
-
-
-//    public void putYUVData(Image image, int length) {
-//        if (YUVQueue.size() >= 10) {
-//            YUVQueue.poll();
-//        }
-//        YUVQueue.add(image);
-//    }
 
 
     /**
@@ -534,7 +526,7 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
                 Log.d(TAG, "largest.height: " + largest.getHeight());
 
                 mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
-                        ImageFormat.YUV_420_888, /*maxImages*/5);
+                        ImageFormat.YUV_420_888, /*maxImages*/3);
 
 //                mImageReader.setOnImageAvailableListener(
 //                        mOnImageAvailableListener, mBackgroundHandler);
@@ -634,7 +626,10 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
                 mImageReader.setOnImageAvailableListener(
                         mOnImageAvailableListener, null);
                 sendQuene = CameraActivity.quene.getH264SendQueue();
+//                宽*高
+//                mH264Encode = new EncoderH264(960,540,framerate);
                 mH264Encode = new EncoderH264(480,320,framerate);
+
                 Log.d(TAG, "初始化编码器成功！");
                 try {
                     mH264Encode.createFile();

@@ -21,6 +21,7 @@ import com.example.android.camera2basic.R;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by xk on 4/23/17.
@@ -31,7 +32,10 @@ public class ShowFragment extends Fragment {
 
 //    CameraActivity mainAC;
     private Quene quene;
+    private BlockingQueue<byte[]> H264RecvQueue;
     public ShowFragment(){
+        quene = CameraActivity.quene;
+        H264RecvQueue  = quene.getH264RecvQueue();
     }
     @Nullable
     @Override
@@ -55,6 +59,9 @@ public class ShowFragment extends Fragment {
 //        new decodeH2Thread().start();
 //        getActivity().findViewById(R.id.videoTextureView);
 
+
+        initMediaCodec();
+
     }
 
     @Override
@@ -62,8 +69,8 @@ public class ShowFragment extends Fragment {
         super.onAttach(context);
 
 //        mainAC = (CameraActivity) getActivity();
-        quene = CameraActivity.quene;
-        initMediaCodec();
+//        quene = CameraActivity.quene;
+//        initMediaCodec();
     }
 
     private MediaCodec mPlayCodec;
@@ -86,6 +93,7 @@ public class ShowFragment extends Fragment {
                 try {
                     //通过多媒体格式名创建一个可用的解码器
                     mPlayCodec = MediaCodec.createDecoderByType("video/avc");
+                    Log.d(TAG, "解码器配置成功");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -115,79 +123,234 @@ public class ShowFragment extends Fragment {
     private boolean isPlay = false;
     public void startPlay(){
         isPlay = true;
-        new decodeH2Thread().start();
+//        new decodeH2Thread().start();
+        new Thread(new decodeH264Thread()).start();
     }
-    long pts = 0;
-    long generateIndex = 0;
-//  解码并显示
-    class decodeH2Thread extends Thread{
-        @Override
-        public void run() {
-            super.run();
-            while(true){
-                if (isPlay){
-                    MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-                    long startMs = System.currentTimeMillis();
-                    long timeoutUs = 10000;
-
-                    int inIndex = mPlayCodec.dequeueInputBuffer(timeoutUs);
-                    if (inIndex >= 0) {
-                        pts = computePresentationTime(generateIndex);
-                        ByteBuffer byteBuffer = mPlayCodec.getInputBuffer(inIndex);
-
-                        byteBuffer.clear();
-                        byte[] b = quene.getOneNalu();
-                        if (b!=null){
-                            byteBuffer.put(b);
-                            Log.d(TAG, "解码器输入数据"+b);
-                            mPlayCodec.queueInputBuffer(inIndex, 0, b.length, pts, 0);
-//                            mPlayCodec.queueInputBuffer(inIndex, 0, 1, pts, 0);
-                            generateIndex += 1;
-                        }else{
-                            byte[] dummyFrame = new byte[]{0x00, 0x00, 0x01, 0x20};
-                            byteBuffer.put(dummyFrame);
-                            mPlayCodec.queueInputBuffer(inIndex, 0, dummyFrame.length, pts, 0);
-                            generateIndex += 1;
-                        }
-                    }
-
-
-                    int outIndex = mPlayCodec.dequeueOutputBuffer(info, timeoutUs);
-//                    if (outIndex<0){
-//                        Log.d(TAG,outIndex+"");//-1
-//                        continue;
+//    long pts = 0;
+//    long generateIndex = 0;
+//  //解码并显示
+//    class decodeH2Thread extends Thread{
+//        @Override
+//        public void run() {
+//            super.run();
+//            while(true){
+//                if (isPlay){
+//                    MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+//                    long startMs = System.currentTimeMillis();
+//                    long timeoutUs = 10000;
+//
+//                    int inIndex = mPlayCodec.dequeueInputBuffer(timeoutUs);
+//                    Log.d(TAG, "输入buffer序号"+inIndex);
+//                    if (inIndex >= 0) {
+//                        pts = computePresentationTime(generateIndex);
+//                        ByteBuffer byteBuffer = mPlayCodec.getInputBuffer(inIndex);
+//
+//                        byteBuffer.clear();
+//                        byte[] b = quene.getOneNalu();
+//                        if (b!=null){
+//                            byteBuffer.put(b);
+//                            Log.d(TAG, "将数据放入解码器"+b.length);
+//                            mPlayCodec.queueInputBuffer(inIndex, 0, b.length, pts, 1);
+////                            mPlayCodec.queueInputBuffer(inIndex, 0, b.length, 0, 0);
+//
+////                            generateIndex += 1;
+//                        }else{
+//                            Log.d(TAG, "获得数据单元为空");
+//                            byte[] dummyFrame = new byte[]{0x00, 0x00, 0x01, 0x20};
+//                            byteBuffer.put(dummyFrame);
+//                            mPlayCodec.queueInputBuffer(inIndex, 0, dummyFrame.length, pts, 1);
+//                            generateIndex += 1;
+////                            mPlayCodec.queueInputBuffer(inIndex, 0, dummyFrame.length, 0, 0);
+//
+//                        }
 //                    }
-                    Log.d(TAG, "outIndex"+outIndex);
-                    if (outIndex >= 0) {
-                        ByteBuffer outputBuffer = mPlayCodec.getOutputBuffer(outIndex);
-                        outputBuffer.position(info.offset);
-                        outputBuffer.limit(info.offset + info.size);
-                        Log.d(TAG,"length"+info.offset + info.size);
-                        Log.d(TAG, "输出数据："+info.toString());
-
-
-//                        outputBuffer.get(outData);
-
-
-                        boolean doRender = (info.size != 0);
-                        mPlayCodec.releaseOutputBuffer(outIndex, doRender);
-                        Log.d(TAG, "no output");
-                        try {
-                            Log.d(TAG, "sleep");
-                            Thread.sleep(10);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                    } else {
-
-                    }
-                }
-            }
-        }
-    }
+//
+//
+//                    int outIndex = mPlayCodec.dequeueOutputBuffer(info, timeoutUs);
+//                    Log.d(TAG, "outIndex"+outIndex);
+//                    if (outIndex >= 0) {
+//                        ByteBuffer outputBuffer = mPlayCodec.getOutputBuffer(outIndex);
+//                        outputBuffer.position(info.offset);
+//                        outputBuffer.limit(info.offset + info.size);
+//                        Log.d(TAG,"length"+info.offset + info.size);
+//
+//                        boolean doRender = (info.size != 0);
+//                        mPlayCodec.releaseOutputBuffer(outIndex, doRender);
+//                        try {
+//                            Log.d(TAG, "sleep");
+//                            Thread.sleep(10);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//
+//                    } else {
+//                        Log.d(TAG, "no output");
+//                    }
+//
+//                }
+//            }
+//        }
+//    }
 
     private long computePresentationTime(long frameIndex) {
         return 132 + frameIndex * 1000000/ 24;
     }
+
+    private boolean mStopFlag = false;
+    private class decodeH264Thread implements Runnable{
+        @Override
+        public void run() {
+
+            try {
+                Log.d(TAG, "进入解码线程");
+                decodeLoop();
+            } catch (Exception e) {
+                Log.d(TAG, "decodeLoop error");
+            }
+
+
+        }
+        //标记 camera旧api 已改
+
+        private byte[] streamBuffer = null;
+        private void decodeLoop(){
+
+//            ByteBuffer[] inputBuffers = mPlayCodec.getInputBuffers();
+            //解码后的数据，包含每一个buffer的元数据信息，例如偏差，在相关解码器中有效的数据大小
+
+
+            MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+            long startMs = System.currentTimeMillis();
+            long timeoutUs = 10000;
+
+                while (true){
+                    int inIndex = mPlayCodec.dequeueInputBuffer(timeoutUs);
+                    if (inIndex >= 0) {
+                        ByteBuffer byteBuffer = mPlayCodec.getInputBuffer(inIndex);
+//                        ByteBuffer byteBuffer = inputBuffers[inIndex];
+                        byteBuffer.clear();
+
+                        //队列获取文件数据
+                        byte[] b = getOneNalu();
+                        if (b!=null){
+                            try{
+                                byteBuffer.put(b);
+                                Log.d(TAG, "放入一桢数据成功");
+                                Thread.sleep(30);
+                            }catch (InterruptedException e){}
+                        } else {
+                            Log.d(TAG, "获得数据单元为空");
+                            byte[] dummyFrame = new byte[]{0x00, 0x00, 0x01, 0x20};
+                            byteBuffer.put(dummyFrame);
+                            mPlayCodec.queueInputBuffer(inIndex, 0, dummyFrame.length, 0, 0);
+                        Log.d(TAG, "放入一桢数据成功");
+                        }
+
+
+                        //在给指定Index的inputbuffer[]填充数据后，调用这个函数把数据传给解码器
+//                        mPlayCodec.queueInputBuffer(inIndex, 0, nextFrameStart - startIndex, 0, 0);
+                        mPlayCodec.queueInputBuffer(inIndex, 0, b.length, 0, 0);
+
+                    } else {
+                        continue;
+                    }
+                    int outIndex = mPlayCodec.dequeueOutputBuffer(info, timeoutUs);
+                    if (outIndex >= 0) {
+                        while (info.presentationTimeUs / 1000 > System.currentTimeMillis() - startMs) {
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        boolean doRender = (info.size != 0);
+                        mPlayCodec.releaseOutputBuffer(outIndex, doRender);
+                    } else {
+                        Log.d(TAG, "获得数据单元为空");
+                    }
+                }
+//                mStopFlag = true;
+            }
+
+        }
+
+
+
+    }
+
+    private byte[] currentBuff = new byte[102400];
+    private int currentBuffStart = 0;//valid data start
+    private int currentBuffEnd = 0;
+    int cnt = 0;
+
+    public byte[] getOneNalu(){
+        int n = getNextIndex();
+        if (n <= 0){
+            Log.d(TAG,"获得数据queue size"+ H264RecvQueue.size());
+            return null;
+        }
+        Log.d(TAG,"get one"+n);
+        byte[] naluu = new byte[n-currentBuffStart];
+//        Log.d(TAG,n+"--n");
+//        Log.d(TAG,currentBuffStart+"");
+        System.arraycopy(currentBuff, currentBuffStart, naluu, 0, n-currentBuffStart);
+
+        //handle currentBuff
+        System.arraycopy(currentBuff, n , currentBuff, 0, currentBuff.length - n);
+
+        //set index
+        currentBuffStart = 0;
+        currentBuffEnd = currentBuffEnd - naluu.length;
+        return naluu;
+    }
+    //added by deonew
+    private int nextNaluHead = -1;
+    public int getNextIndex(){
+        //int nextNaluHead;
+        nextNaluHead = getNextIndexOnce();
+
+        //currentBuff don't contain a nalu
+        //poll data
+
+        while(nextNaluHead == -1) {
+            if (H264RecvQueue.isEmpty()){
+                Log.d(TAG,"queue empty");
+                break;}
+//            }else{
+            byte[] tmp =H264RecvQueue.poll();
+            System.arraycopy(tmp,0,currentBuff,currentBuffEnd,tmp.length);
+            currentBuffEnd = currentBuffEnd + tmp.length;
+            nextNaluHead = getNextIndexOnce();
+            // }
+            cnt++;
+//            Log.d(TAG,"poll"+cnt);
+        }
+        nextNaluHead = nextNaluHead - 3;
+        // currentBuffStart = nextNaluHead;
+        return nextNaluHead;
+    }
+
+    //get next 000000[01]
+    public int getNextIndexOnce(){
+        int nextIndex = -1;
+        byte[] naluHead = {0,0,0,1};
+        byte[] correctBuff = {0,1,2,0};
+        int i=0;
+        int index = 0;
+        for(i = currentBuffStart+1; i < currentBuffEnd;i++){
+            while (index > 0 && currentBuff[i] != naluHead[index]) {
+                index = correctBuff[index - 1];
+            }
+            if (currentBuff[i] == naluHead[index]) {
+                index++;
+                if (index == 4){
+                    nextIndex = i;//i = 00000001中的01
+                    break;
+                }
+            }
+        }
+        return nextIndex;
+    }
+
 }

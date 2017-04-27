@@ -30,7 +30,7 @@ import java.util.concurrent.BlockingQueue;
 public class EncoderH264 {
     private final static String TAG = "MeidaCodec";
     private Quene queue;
-    private int TIMEOUT_USEC = 20000;
+    private int TIMEOUT_USEC = 11000;
 
     private MediaCodec mediaCodec;
     int m_width;
@@ -42,8 +42,6 @@ public class EncoderH264 {
 
     public byte[] HeadInfo;
 
-    byte tstBte = 0;
-
     public EncoderH264(int imageW, int imageH,int framerate){
         queue = CameraActivity.quene;
         m_width = imageW;
@@ -54,7 +52,7 @@ public class EncoderH264 {
         MediaFormat mediaFormat = MediaFormat.createVideoFormat("video/avc", imageW, imageH);
         mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
         mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, imageW * imageH * 5);
-        mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, 24);
+        mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, m_framerate);
         mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
         try {
             mediaCodec = MediaCodec.createEncoderByType("video/avc");
@@ -69,19 +67,14 @@ public class EncoderH264 {
 
     long pts = 0;
     long generateIndex = 0;
-//    public void StartEncoderThread(Image image){
-//        Thread EncoderThread = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                //long startMs = System.currentTimeMillis();
-      public synchronized void code(Image image){
-          if (queue.getH264SendQueue() == null){
-              //sendQuene = new Quene();
-          }
-            YUV_888To420(image);
-//          tstBte+=1;
 
+      public void code(Image image){
 
+          Boolean support = isImageFormatSupported(image);
+          Log.d(TAG, "数据格式支持"+support);
+
+//          image格式转换获得I420格式的数据
+            data = getDataFromImage(image,2);
 
             ByteBuffer[] inputBuffers = mediaCodec.getInputBuffers();
             ByteBuffer[] outputBuffers = mediaCodec.getOutputBuffers();
@@ -91,16 +84,15 @@ public class EncoderH264 {
             int inputBufferId = mediaCodec.dequeueInputBuffer(-1);
             if (inputBufferId >= 0) {
 //            ByteBuffer inputBuffer = mediaCodec.getInputBuffer(inputBufferId);
-                pts = computePresentationTime(generateIndex);
                 ByteBuffer inputBuffer = inputBuffers[inputBufferId];
+                pts = computePresentationTime(generateIndex);
                 // fill inputBuffer with valid data
-//                test用例
-//                inputBuffer.put(tstBte);
-//                Log.d(TAG, "放入的data" + tstBte);
+                inputBuffer.clear();
                 inputBuffer.put(data);
                 Log.d(TAG, "放入的data" + data);
-//                mediaCodec.queueInputBuffer(inputBufferId, 0, 1, pts, 0);
-                mediaCodec.queueInputBuffer(inputBufferId, 0, data.length, pts, 0);
+                //xk注释4／27
+//                mediaCodec.queueInputBuffer(inputBufferId, 0, data.length,pts, 1);
+                mediaCodec.queueInputBuffer(inputBufferId, 0, data.length,pts, 0);
 
                 generateIndex += 1;
                 Log.d(TAG, "放入数据成功");
@@ -109,7 +101,9 @@ public class EncoderH264 {
             MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
 
             int outputBufferId = mediaCodec.dequeueOutputBuffer(bufferInfo, TIMEOUT_USEC);
-            Log.d(TAG, "outputBufferId "+outputBufferId);
+//          int outputBufferId = mediaCodec.dequeueOutputBuffer(bufferInfo, 100);
+
+          Log.d(TAG, "outputBufferId "+outputBufferId);
             switch (outputBufferId) {
                 case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED://当buffer变化时，client必须重新指向新的buffer
                     Log.d(TAG, ">> output buffer changed ");
@@ -122,58 +116,56 @@ public class EncoderH264 {
                     Log.d(TAG, ">> dequeueOutputBuffer timeout超时 ");
                     break;
                 default:
-//                ByteBuffer outputBuffer = mediaCodec.getOutputBuffer(outputBufferId);
+//                    while (outputBufferId >= 0) {
+//                        ByteBuffer outputBuffer = mediaCodec.getOutputBuffer(outputBufferId);
                     ByteBuffer outputBuffer = outputBuffers[outputBufferId];
-                    MediaFormat bufferFormat = mediaCodec.getOutputFormat(outputBufferId); // option A
-                    // bufferFormat is identical to outputFormat
-                    // outputBuffer is ready to be processed or rendered.
-                    //outputBuffer.slice();
-                    byte[] outData = new byte[bufferInfo.size];
-                    outputBuffer.get(outData);
-                    //deal key frame v3.0
-                    if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_CODEC_CONFIG) {
-                        //startSendH264 frame
-                        HeadInfo = new byte[outData.length];
-                        HeadInfo = outData;
-                        Log.d(TAG, "head");
-                    } else if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_KEY_FRAME) {
-                        //key frame
-                        byte[] key = new byte[outData.length + HeadInfo.length];
-                        //param: src srcpos dec decpos length
-                        System.arraycopy(HeadInfo, 0, key, 0, HeadInfo.length);
-                        System.arraycopy(outData, 0, key, HeadInfo.length, outData.length);
-                        //version 1.0
-                        //write key frame to h264
-                        try {
-                            outputStream.write(key, 0, key.length);
-                        } catch (IOException e) {
+                        MediaFormat bufferFormat = mediaCodec.getOutputFormat(outputBufferId); // option A
+                        // bufferFormat is identical to outputFormat
+                        // outputBuffer is ready to be processed or rendered.
+//                        outputBuffer.slice();
+                        byte[] outData = new byte[bufferInfo.size];
+                        outputBuffer.get(outData);
+                        //deal key frame v3.0
+                        if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_CODEC_CONFIG) {
+                            //startSendH264 frame
+                            HeadInfo = new byte[outData.length];
+                            HeadInfo = outData;
+                            Log.d(TAG, "head");
+                        } else if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_KEY_FRAME) {
+                            //key frame
+                            byte[] key = new byte[outData.length + HeadInfo.length];
+                            //param: src srcpos dec decpos length
+                            System.arraycopy(HeadInfo, 0, key, 0, HeadInfo.length);
+                            System.arraycopy(outData, 0, key, HeadInfo.length, outData.length);
+                            //version 1.0
+                            //write key frame to h264
+                            try {
+                                outputStream.write(key, 0, key.length);
+
+                            } catch (IOException e) {
+                            }
+                            queue.offerSendH264Queue(key);
+                            Log.d("key", "key");
+                            //put key frame to queue
+                        } else if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_END_OF_STREAM) {
+                            //end frame
+                            Log.d(TAG, "end");
+                        } else {
+                            try {
+                                outputStream.write(outData, 0, outData.length);
+
+                            } catch (IOException e) {
+                            }
+                            queue.offerSendH264Queue(outData);
+                            Log.d("normal", "normal");
                         }
-                        queue.offerSendH264Queue(key);
-                        Log.d(TAG, "key");
-                        //put key frame to queue
-                    } else if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_END_OF_STREAM) {
-                        //end frame
-                        Log.d(TAG, "end");
-                    } else {
-                        try {
-                            outputStream.write(outData, 0, outData.length);
-                        } catch (IOException e) {
-                        }
-                        queue.offerSendH264Queue(outData);
-                        Log.d(TAG, "normal");
-                    }
-//                        try {
-//                            Thread.sleep(100);
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-                    mediaCodec.releaseOutputBuffer(outputBufferId, false);
-                    image.close();
-                    break;
+                        mediaCodec.releaseOutputBuffer(outputBufferId, false);
+//                        outputBufferId = mediaCodec.dequeueOutputBuffer(bufferInfo, 0);
+//                    }
+                        break;
 
             }
-
- //       });
+          image.close();
       }
 
     private void StopEncoder() {
@@ -206,22 +198,42 @@ public class EncoderH264 {
      * Generates the presentation time for frame N, in microseconds.
      */
     private long computePresentationTime(long frameIndex) {
-        return 132 + frameIndex * 1000000/ m_framerate;
+        return  132 + frameIndex * 1000000/ 24;
     }
 
 
+//编码器颜色
+    private static final int COLOR_FormatI420 = 1;
+//   摄像头拍摄颜色
+    private static final int COLOR_FormatNV21 = 2;
 
-    public void YUV_888To420(Image image){
-        //将YUV_888格式的图片转换为YUV_420
+    private static boolean isImageFormatSupported(Image image) {
+        int format = image.getFormat();
+        switch (format) {
+            case ImageFormat.YUV_420_888:
+            case ImageFormat.NV21:
+            case ImageFormat.YV12:
+                return true;
+        }
+        return false;
+    }
+
+
+    private static byte[] getDataFromImage(Image image, int colorFormat) {
+        if (colorFormat != COLOR_FormatI420 && colorFormat != COLOR_FormatNV21) {
+            throw new IllegalArgumentException("only support COLOR_FormatI420 " + "and COLOR_FormatNV21");
+        }
+        if (!isImageFormatSupported(image)) {
+            throw new RuntimeException("can't convert Image to byte array, format " + image.getFormat());
+        }
         Rect crop = image.getCropRect();
-        int format = image.getFormat();//format: 35 = 0x23
+        int format = image.getFormat();
         int width = crop.width();
         int height = crop.height();
-
         Image.Plane[] planes = image.getPlanes();
-
-        data = new byte[width * height * ImageFormat.getBitsPerPixel(format) / 8];
+        byte[] data = new byte[width * height * ImageFormat.getBitsPerPixel(format) / 8];
         byte[] rowData = new byte[planes[0].getRowStride()];
+        if (true) Log.v(TAG, "get data from " + planes.length + " planes");
         int channelOffset = 0;
         int outputStride = 1;
         for (int i = 0; i < planes.length; i++) {
@@ -231,42 +243,59 @@ public class EncoderH264 {
                     outputStride = 1;
                     break;
                 case 1:
-                    channelOffset = width * height;
-                    outputStride = 1;
+                    if (colorFormat == COLOR_FormatI420) {
+                        channelOffset = width * height;
+                        outputStride = 1;
+                    } else if (colorFormat == COLOR_FormatNV21) {
+                        channelOffset = width * height + 1;
+                        outputStride = 2;
+                    }
                     break;
                 case 2:
-                    channelOffset = (int) (width * height * 1.25);
-                    outputStride = 1;
+                    if (colorFormat == COLOR_FormatI420) {
+                        channelOffset = (int) (width * height * 1.25);
+                        outputStride = 1;
+                    } else if (colorFormat == COLOR_FormatNV21) {
+                        channelOffset = width * height;
+                        outputStride = 2;
+                    }
                     break;
             }
-            ByteBuffer planebuffer = planes[i].getBuffer();
+            ByteBuffer buffer = planes[i].getBuffer();
             int rowStride = planes[i].getRowStride();
             int pixelStride = planes[i].getPixelStride();
+            if (true) {
+                Log.v(TAG, "pixelStride " + pixelStride);
+                Log.v(TAG, "rowStride " + rowStride);
+                Log.v(TAG, "width " + width);
+                Log.v(TAG, "height " + height);
+                Log.v(TAG, "buffer size " + buffer.remaining());
+            }
             int shift = (i == 0) ? 0 : 1;
             int w = width >> shift;
             int h = height >> shift;
-            planebuffer.position(rowStride * (crop.top >> shift) + pixelStride * (crop.left >> shift));
+            buffer.position(rowStride * (crop.top >> shift) + pixelStride * (crop.left >> shift));
             for (int row = 0; row < h; row++) {
                 int length;
                 if (pixelStride == 1 && outputStride == 1) {
                     length = w;
-                    planebuffer.get(data, channelOffset, length);
+                    buffer.get(data, channelOffset, length);
                     channelOffset += length;
                 } else {
                     length = (w - 1) * pixelStride + 1;
-                    planebuffer.get(rowData, 0, length);
+                    buffer.get(rowData, 0, length);
                     for (int col = 0; col < w; col++) {
                         data[channelOffset] = rowData[col * pixelStride];
                         channelOffset += outputStride;
                     }
                 }
                 if (row < h - 1) {
-                    planebuffer.position(planebuffer.position() + rowStride - length);
+                    buffer.position(buffer.position() + rowStride - length);
                 }
             }
+            if (true) Log.v(TAG, "Finished reading data from plane " + i);
         }
-
-        Log.d(TAG,"data come");
+        return data;
     }
 
 }

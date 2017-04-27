@@ -62,11 +62,13 @@
 
 
     <!--buttons-->
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/showView">
+        android:gravity="center_vertical"
+        android:layout_below="@+id/showView"
+        android:layout_alignParentStart="true">
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -78,21 +80,38 @@
             android:layout_height="wrap_content"
             android:text="play"
             android:layout_alignLeft="@+id/recvH264V3"
-            android:id="@+id/playH264V3"/>
+            android:id="@+id/playH264V3"
+            android:layout_below="@+id/recvH264V3"/>
 
         <Button
             android:id="@+id/record"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="recordH264" />
+            android:text="recordH264"
+            android:layout_below="@+id/playH264V3"/>
 
         <Button
             android:id="@+id/sendBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="send" />
+            android:text="send"
+            android:layout_below="@+id/record"/>
 
-    </LinearLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/server"
+            android:text="server"
+            android:layout_below="@+id/sendBtn"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/client"
+            android:text="client"
+            android:layout_below="@+id/server" />
+
+    </RelativeLayout>
 
 
 </RelativeLayout>
