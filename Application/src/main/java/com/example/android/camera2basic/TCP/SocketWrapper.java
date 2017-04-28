@@ -65,9 +65,8 @@ public class SocketWrapper {
             try {
                 if (client) {
 //                    clientSocket = new Socket("192.168.1.133", 18888);
-//                    clientSocket = new Socket("192.168.1.128", 18888);
-                    clientSocket = new Socket("10.105.39.244", 18888);
-
+//                    clientSocket = new Socket("10.105.39.244", 18888);
+                    clientSocket = new Socket("10.105.36.141", 18888);
 
                     Log.d(TAG, "客户端连接成功");
                 }else {
@@ -141,7 +140,7 @@ public class SocketWrapper {
                         Log.d(TAG, "recv"+H264RecvQueue .size());
                         byte[] readByte = new byte[2000];
                         int n;
-                        Log.d(TAG, "ins"+ recvStream.read(readByte));
+//                        Log.d(TAG, "ins"+ recvStream.read(readByte));
                         while((n =  recvStream.read(readByte))!=-1){
                             Log.d(TAG,"receive");
 //                            byte[] number = new byte[4];

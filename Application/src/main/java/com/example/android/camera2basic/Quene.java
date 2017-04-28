@@ -26,11 +26,16 @@ public class Quene {
     public synchronized BlockingQueue<byte[]> getH264RecvQueue(){
         return H264RecvQueue;
     }
+    int totalSendcnt = 0;
     public void offerSendH264Queue(byte[] b){
+        int m = b.length%1000;
         int n = b.length/1000;
-        for(int i = 0;i< n+1;i++){
+        if (m !=0){
+            n++;
+        }
+        for(int i = 0;i< n;i++){
             int len = 1000;
-            if (i == n){
+            if (i == n - 1 ){
                 len = b.length - i*1000;
             }
             if (len == 0)
@@ -38,8 +43,7 @@ public class Quene {
             byte[] tmp = new byte[len];
             System.arraycopy(b,i*1000,tmp,0,len);
             H264SendQueue.offer(tmp);
-            i++;
-
+            totalSendcnt++;
         }
     }
 

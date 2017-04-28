@@ -25,13 +25,7 @@ import android.widget.Button;
 
 import com.example.android.camera2basic.Fragment.Camera2BasicFragment;
 import com.example.android.camera2basic.Fragment.ShowFragment;
-import com.example.android.camera2basic.TCP.RecvH264;
-import com.example.android.camera2basic.TCP.SendH264;
 import com.example.android.camera2basic.TCP.SocketWrapper;
-
-import java.net.Socket;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 public class CameraActivity extends FragmentActivity{
     private final String TAG = "CameraActivity";
