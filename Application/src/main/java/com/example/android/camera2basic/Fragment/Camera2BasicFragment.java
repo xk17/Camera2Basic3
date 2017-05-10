@@ -244,7 +244,7 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
 //----------------------4.19-----------------------------------------------------------
 
     private EncoderH264 mH264Encode = null;
-    private int framerate = 24;
+    private int framerate = 12;
     public int ImageWidth = 0;
     public int ImageHeight = 0;
 

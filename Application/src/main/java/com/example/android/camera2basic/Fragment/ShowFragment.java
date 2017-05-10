@@ -6,6 +6,7 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -19,6 +20,9 @@ import com.example.android.camera2basic.CameraActivity;
 import com.example.android.camera2basic.Quene;
 import com.example.android.camera2basic.R;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.BlockingQueue;
@@ -76,7 +80,7 @@ public class ShowFragment extends Fragment {
     private MediaCodec mPlayCodec;
     private int Video_Width = 500;
     private int Video_Height = 300;
-    private int PlayFrameRate = 15;
+    private int PlayFrameRate = 12;
     private Boolean isUsePpsAndSps = false;
     private SurfaceView mPlaySurface = null;
     private SurfaceHolder mPlaySurfaceHolder;
@@ -203,6 +207,7 @@ public class ShowFragment extends Fragment {
 
             try {
                 Log.d(TAG, "进入解码线程");
+                createFile();
                 decodeLoop();
             } catch (Exception e) {
                 Log.d(TAG, "decodeLoop error");
@@ -239,13 +244,12 @@ public class ShowFragment extends Fragment {
                                 Thread.sleep(30);
                             }catch (InterruptedException e){}
                         } else {
-                            Log.d(TAG, "获得数据单元为空");
+                            Log.d(TAG, "从接收队列获得一帧数据为空");
                             byte[] dummyFrame = new byte[]{0x00, 0x00, 0x01, 0x20};
                             byteBuffer.put(dummyFrame);
                             mPlayCodec.queueInputBuffer(inIndex, 0, dummyFrame.length, 0, 0);
-                        Log.d(TAG, "放入一桢数据成功");
+                            Log.d(TAG, "放入空白帧数据成功");
                         }
-
 
                         //在给指定Index的inputbuffer[]填充数据后，调用这个函数把数据传给解码器
 //                        mPlayCodec.queueInputBuffer(inIndex, 0, nextFrameStart - startIndex, 0, 0);
@@ -256,24 +260,37 @@ public class ShowFragment extends Fragment {
                     }
                     int outIndex = mPlayCodec.dequeueOutputBuffer(info, timeoutUs);
                     if (outIndex >= 0) {
-                        while (info.presentationTimeUs / 1000 > System.currentTimeMillis() - startMs) {
-                            try {
-                                Thread.sleep(100);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
+//                        while (info.presentationTimeUs / 1000 > System.currentTimeMillis() - startMs) {
+//                            try {
+//                                Thread.sleep(100);
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
 
                         boolean doRender = (info.size != 0);
                         mPlayCodec.releaseOutputBuffer(outIndex, doRender);
                     } else {
-                        Log.d(TAG, "获得数据单元为空");
+                        Log.d(TAG, "获得解码输出的数据单元为空");
                     }
                 }
 //                mStopFlag = true;
             }
 
         }
+
+    private FileOutputStream outputStream;
+    private static String path = Environment.getExternalStorageDirectory() + "/carxk3.h264";
+    public void createFile() throws FileNotFoundException {
+        File file = new File(path);
+        if (file.exists()){
+            file.delete();
+        }
+
+        Log.d(TAG, "init file");
+        outputStream = new FileOutputStream(path, true);
+    }
+
 
 
     private byte[] currentBuff = new byte[102400];
@@ -284,10 +301,10 @@ public class ShowFragment extends Fragment {
     public byte[] getOneNalu(){
         int n = getNextIndex();
         if (n <= 0){
-            Log.d(TAG,"获得数据queue size"+ H264RecvQueue.size());
             return null;
         }
-        Log.d(TAG,"get one"+n);
+//        Log.d(TAG,"get one"+n);
+        Log.d(TAG,"获得数据queue size"+ H264RecvQueue.size());
         byte[] naluu = new byte[n-currentBuffStart];
 //        Log.d(TAG,n+"--n");
 //        Log.d(TAG,currentBuffStart+"");
@@ -303,7 +320,7 @@ public class ShowFragment extends Fragment {
     }
     //added by deonew
     private int nextNaluHead = -1;
-    public int getNextIndex(){
+    public int getNextIndex()  {
         //int nextNaluHead;
         nextNaluHead = getNextIndexOnce();
 
@@ -313,13 +330,23 @@ public class ShowFragment extends Fragment {
         while(nextNaluHead == -1) {
             if (H264RecvQueue.isEmpty()){
                 Log.d(TAG,"queue empty");
-                break;}
-//            }else{
-            byte[] tmp =H264RecvQueue.poll();
+//                break;
+            } else {
+                byte[] tmp =H264RecvQueue.poll();
+                Log.d(TAG,"获得接收队列中的数据");
+//            4/28 12：00 新增 接收队列输出写入文件并发给解码器
+
+//            try {
+//                outputStream.write(tmp);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            5/10 为了编码的有效性，把上述用于测试的写入文件删掉
+
             System.arraycopy(tmp,0,currentBuff,currentBuffEnd,tmp.length);
             currentBuffEnd = currentBuffEnd + tmp.length;
             nextNaluHead = getNextIndexOnce();
-            // }
+             }
             cnt++;
 //            Log.d(TAG,"poll"+cnt);
         }

@@ -64,9 +64,8 @@ public class SocketWrapper {
             Log.d(TAG, "client符号"+client);
             try {
                 if (client) {
-//                    clientSocket = new Socket("192.168.1.133", 18888);
-//                    clientSocket = new Socket("10.105.39.244", 18888);
-                    clientSocket = new Socket("10.105.36.141", 18888);
+//                    clientSocket = new Socket("10.105.36.141", 18888);
+                    clientSocket = new Socket("10.1.1.1", 8888);
 
                     Log.d(TAG, "客户端连接成功");
                 }else {
@@ -117,10 +116,10 @@ public class SocketWrapper {
                         } catch (IOException e) {
                         }
                     }
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                    }
+//                    try {
+//                        Thread.sleep(10);
+//                    } catch (InterruptedException e) {
+//                    }
                 }
             }
         }
@@ -155,11 +154,11 @@ public class SocketWrapper {
 //                            Log.d(TAG, "接收序号："+ num);
                             outputStream.write(toOffer);
                             Log.d(TAG,""+H264RecvQueue .size());
-                            try {
-                                Thread.sleep(5);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+//                            try {
+//                                Thread.sleep(5);
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
                         }
                     }
                 }

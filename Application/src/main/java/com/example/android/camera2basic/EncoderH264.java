@@ -51,9 +51,11 @@ public class EncoderH264 {
 
         MediaFormat mediaFormat = MediaFormat.createVideoFormat("video/avc", imageW, imageH);
         mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
+//        同样分辨率下，视频文件的码流越大，压缩比就越小，画面质量就越高。
+
         mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, imageW * imageH * 5);
         mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, m_framerate);
-        mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
+        mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 5);
         try {
             mediaCodec = MediaCodec.createEncoderByType("video/avc");
         } catch (IOException e) {
