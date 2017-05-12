@@ -52,9 +52,9 @@ public class EncoderH264 {
         MediaFormat mediaFormat = MediaFormat.createVideoFormat("video/avc", imageW, imageH);
         mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
 //        同样分辨率下，视频文件的码流越大，压缩比就越小，画面质量就越高。
-
         mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, imageW * imageH * 5);
         mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, m_framerate);
+        mediaFormat.setInteger(MediaFormat.KEY_ROTATION, 90);
         mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 5);
         try {
             mediaCodec = MediaCodec.createEncoderByType("video/avc");
@@ -72,8 +72,8 @@ public class EncoderH264 {
 
       public void code(Image image){
 
-          Boolean support = isImageFormatSupported(image);
-          Log.d(TAG, "数据格式支持"+support);
+          isImageFormatSupported(image);
+
 
 //          image格式转换获得I420格式的数据
             data = getDataFromImage(image,2);
@@ -211,6 +211,8 @@ public class EncoderH264 {
 
     private static boolean isImageFormatSupported(Image image) {
         int format = image.getFormat();
+//        测试格式为35，即YUV_420_888
+//        Log.d(TAG, format + "");
         switch (format) {
             case ImageFormat.YUV_420_888:
             case ImageFormat.NV21:
@@ -220,7 +222,7 @@ public class EncoderH264 {
         return false;
     }
 
-
+// 设置参数colorFormat把Image转换成NV21（参数为2）或I420（参数为1）格式，数据为byte型
     private static byte[] getDataFromImage(Image image, int colorFormat) {
         if (colorFormat != COLOR_FormatI420 && colorFormat != COLOR_FormatNV21) {
             throw new IllegalArgumentException("only support COLOR_FormatI420 " + "and COLOR_FormatNV21");

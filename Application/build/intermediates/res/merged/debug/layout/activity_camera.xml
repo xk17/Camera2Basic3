@@ -13,52 +13,66 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<!--<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--xmlns:tools="http://schemas.android.com/tools"-->
-    <!--android:id="@+id/container"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:background="#000"-->
-    <!--tools:context="com.example.android.camera2basic.CameraActivity" />-->
+
+
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent" >
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="1216px"
+    android:layout_width="800px"
+    tools:context="com.example.android.camera2basic.CameraActivity">
 
 
-    <LinearLayout
-        android:id="@+id/cameraPreview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark"
-        android:orientation="vertical"></LinearLayout>
-    <LinearLayout
-        android:id="@+id/sendLayout"
+    <RelativeLayout
+        android:id="@+id/showView"
+        android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/cameraPreview"
-        >
-        <EditText
-            android:layout_width="500px"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="set send"/>
-    </LinearLayout>
+        android:background="@color/yellow"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true">
 
-    <LinearLayout
-        android:id="@+id/showView"
-        android:layout_below="@+id/sendLayout"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="300px"
-        android:background="@color/yellow">
-        <SurfaceView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/videoPlay"/>
-    </LinearLayout>
+        <FrameLayout
+            android:id="@+id/cameraPreview"
+            android:layout_width="399px"
+            android:layout_height="500px"
+            android:background="@color/colorPrimaryDark"
+            android:orientation="vertical"/>
+        <FrameLayout
+            android:id="@+id/videoPlay1"
+            android:layout_width="399px"
+            android:layout_height="500px"
+            android:background="@color/colorAccent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"/>
+        <ImageView
+            android:id="@+id/vertical_line"
+            android:layout_width="2px"
+            android:layout_height="1000px"
+            android:background="#ffffff"
+            android:layout_toLeftOf="@id/videoPlay1" />
+        <ImageView
+            android:id="@+id/horizonl_line"
+            android:layout_width="800px"
+            android:layout_height="2px"
+            android:background="#ffffff"
+            android:layout_below="@+id/videoPlay1" />
+        <FrameLayout
+            android:layout_width="399px"
+            android:layout_height="500px"
+            android:id="@+id/videoPlay2"
+            android:background="@color/colorAccent"
+            android:layout_below="@+id/horizonl_line"
+            android:layout_toLeftOf="@+id/vertical_line" />
+        <FrameLayout
+            android:layout_width="399px"
+            android:layout_height="500px"
+            android:background="@color/colorPrimaryDark"
+            android:id="@+id/videoPlay3"
+            android:layout_below="@+id/horizonl_line"
+            android:layout_toRightOf="@+id/vertical_line" />
+
+    </RelativeLayout>
 
 
     <!--buttons-->
@@ -66,36 +80,41 @@
         android:id="@+id/btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
+        android:gravity="fill_horizontal"
         android:layout_below="@+id/showView"
         android:layout_alignParentStart="true">
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/recvH264V3"
-            android:text="recv" />
+            android:text="recv"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="play"
-            android:layout_alignLeft="@+id/recvH264V3"
             android:id="@+id/playH264V3"
-            android:layout_below="@+id/recvH264V3"/>
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/recvH264V3" />
 
         <Button
             android:id="@+id/record"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="recordH264"
-            android:layout_below="@+id/playH264V3"/>
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/playH264V3"
+            android:layout_alignBottom="@+id/playH264V3" />
 
         <Button
             android:id="@+id/sendBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="send"
-            android:layout_below="@+id/record"/>
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/record" />
 
         <Button
             android:layout_width="wrap_content"
@@ -109,8 +128,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/client"
             android:text="client"
-            android:layout_below="@+id/server" />
-
+            android:layout_below="@+id/playH264V3"
+            android:layout_toEndOf="@+id/server" />
     </RelativeLayout>
 
 

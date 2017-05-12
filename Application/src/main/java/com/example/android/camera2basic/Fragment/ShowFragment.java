@@ -10,7 +10,9 @@ import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -31,7 +33,7 @@ import java.util.concurrent.BlockingQueue;
  * Created by xk on 4/23/17.
  */
 
-public class ShowFragment extends Fragment {
+public class ShowFragment extends Fragment implements View.OnClickListener{
     private final String TAG = "ShowFragment";
 
 //    CameraActivity mainAC;
@@ -47,6 +49,10 @@ public class ShowFragment extends Fragment {
 //        super.onCreateView(inflater, container, savedInstanceState);
         return inflater.inflate(R.layout.fragment_video_show, container, false);
     }
+    @Override
+    public void onViewCreated(final View view, Bundle savedInstanceState) {
+        mPlaySurface = (SurfaceView) view.findViewById(R.id.videoSurfaceView);
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -58,12 +64,6 @@ public class ShowFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-//        initMediaCodec();
-//        new recvSocketThread().start();
-//        new decodeH2Thread().start();
-//        getActivity().findViewById(R.id.videoTextureView);
-
-
         initMediaCodec();
 
     }
@@ -72,9 +72,6 @@ public class ShowFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-//        mainAC = (CameraActivity) getActivity();
-//        quene = CameraActivity.quene;
-//        initMediaCodec();
     }
 
     private MediaCodec mPlayCodec;
@@ -85,10 +82,10 @@ public class ShowFragment extends Fragment {
     private SurfaceView mPlaySurface = null;
     private SurfaceHolder mPlaySurfaceHolder;
     public void initMediaCodec(){
-//    public void initMediaCodec(SurfaceView s){
 
-        CameraActivity v3 = (CameraActivity) getActivity();
-        mPlaySurface = (SurfaceView) v3.findViewById(R.id.videoPlay);
+//        CameraActivity v3 = (CameraActivity) getActivity();
+//        mPlaySurface = (SurfaceView) v3.findViewById(R.id.videoPlay1);
+
         mPlaySurfaceHolder = mPlaySurface.getHolder();
         //回调函数来啦
         mPlaySurfaceHolder.addCallback(new SurfaceHolder.Callback(){
@@ -130,77 +127,18 @@ public class ShowFragment extends Fragment {
 //        new decodeH2Thread().start();
         new Thread(new decodeH264Thread()).start();
     }
-//    long pts = 0;
-//    long generateIndex = 0;
-//  //解码并显示
-//    class decodeH2Thread extends Thread{
-//        @Override
-//        public void run() {
-//            super.run();
-//            while(true){
-//                if (isPlay){
-//                    MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-//                    long startMs = System.currentTimeMillis();
-//                    long timeoutUs = 10000;
-//
-//                    int inIndex = mPlayCodec.dequeueInputBuffer(timeoutUs);
-//                    Log.d(TAG, "输入buffer序号"+inIndex);
-//                    if (inIndex >= 0) {
-//                        pts = computePresentationTime(generateIndex);
-//                        ByteBuffer byteBuffer = mPlayCodec.getInputBuffer(inIndex);
-//
-//                        byteBuffer.clear();
-//                        byte[] b = quene.getOneNalu();
-//                        if (b!=null){
-//                            byteBuffer.put(b);
-//                            Log.d(TAG, "将数据放入解码器"+b.length);
-//                            mPlayCodec.queueInputBuffer(inIndex, 0, b.length, pts, 1);
-////                            mPlayCodec.queueInputBuffer(inIndex, 0, b.length, 0, 0);
-//
-////                            generateIndex += 1;
-//                        }else{
-//                            Log.d(TAG, "获得数据单元为空");
-//                            byte[] dummyFrame = new byte[]{0x00, 0x00, 0x01, 0x20};
-//                            byteBuffer.put(dummyFrame);
-//                            mPlayCodec.queueInputBuffer(inIndex, 0, dummyFrame.length, pts, 1);
-//                            generateIndex += 1;
-////                            mPlayCodec.queueInputBuffer(inIndex, 0, dummyFrame.length, 0, 0);
-//
-//                        }
-//                    }
-//
-//
-//                    int outIndex = mPlayCodec.dequeueOutputBuffer(info, timeoutUs);
-//                    Log.d(TAG, "outIndex"+outIndex);
-//                    if (outIndex >= 0) {
-//                        ByteBuffer outputBuffer = mPlayCodec.getOutputBuffer(outIndex);
-//                        outputBuffer.position(info.offset);
-//                        outputBuffer.limit(info.offset + info.size);
-//                        Log.d(TAG,"length"+info.offset + info.size);
-//
-//                        boolean doRender = (info.size != 0);
-//                        mPlayCodec.releaseOutputBuffer(outIndex, doRender);
-//                        try {
-//                            Log.d(TAG, "sleep");
-//                            Thread.sleep(10);
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//
-//                    } else {
-//                        Log.d(TAG, "no output");
-//                    }
-//
-//                }
-//            }
-//        }
-//    }
 
     private long computePresentationTime(long frameIndex) {
         return 132 + frameIndex * 1000000/ 24;
     }
 
     private boolean mStopFlag = false;
+
+    @Override
+    public void onClick(View v) {
+
+    }
+
     private class decodeH264Thread implements Runnable{
         @Override
         public void run() {
@@ -303,11 +241,8 @@ public class ShowFragment extends Fragment {
         if (n <= 0){
             return null;
         }
-//        Log.d(TAG,"get one"+n);
         Log.d(TAG,"获得数据queue size"+ H264RecvQueue.size());
         byte[] naluu = new byte[n-currentBuffStart];
-//        Log.d(TAG,n+"--n");
-//        Log.d(TAG,currentBuffStart+"");
         System.arraycopy(currentBuff, currentBuffStart, naluu, 0, n-currentBuffStart);
 
         //handle currentBuff

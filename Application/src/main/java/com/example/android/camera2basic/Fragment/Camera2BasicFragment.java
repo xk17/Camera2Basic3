@@ -428,9 +428,6 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
-        view.findViewById(R.id.picture).setOnClickListener(this);
-        view.findViewById(R.id.info).setOnClickListener(this);
-        view.findViewById(R.id.send).setOnClickListener(this);
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
     }
 
@@ -825,28 +822,28 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.picture: {
-                break;
-            }
-            case R.id.info: {
-                Activity activity = getActivity();
-                if (null != activity) {
-                    new AlertDialog.Builder(activity)
-                            .setMessage(R.string.intro_message)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .show();
-                }
-                break;
-            }
-            case R.id.send: {
-                //sendH264.startSendH264();
-                //开始摄像并将数据写入文件中
-                Log.d(TAG,"record");
-                startRecord();
-                break;
-            }
-        }
+//        switch (view.getId()) {
+//            case R.id.picture: {
+//                break;
+//            }
+//            case R.id.info: {
+//                Activity activity = getActivity();
+//                if (null != activity) {
+//                    new AlertDialog.Builder(activity)
+//                            .setMessage(R.string.intro_message)
+//                            .setPositiveButton(android.R.string.ok, null)
+//                            .show();
+//                }
+//                break;
+//            }
+//            case R.id.send: {
+//                //sendH264.startSendH264();
+//                //开始摄像并将数据写入文件中
+//                Log.d(TAG,"record");
+//                startRecord();
+//                break;
+//            }
+//        }
     }
 
     private void setAutoFlash(CaptureRequest.Builder requestBuilder) {

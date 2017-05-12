@@ -142,17 +142,17 @@ public class SocketWrapper {
 //                        Log.d(TAG, "ins"+ recvStream.read(readByte));
                         while((n =  recvStream.read(readByte))!=-1){
                             Log.d(TAG,"receive");
-//                            byte[] number = new byte[4];
-//                            byte[] toOffer = new byte[n-4];
-                            byte[] toOffer = new byte[n];
-//                            System.arraycopy(readByte,0,number,0,4);
-                            System.arraycopy(readByte,0,toOffer,0,n);
+//                          将mac地址取出
+                            byte[] number = new byte[8];
+                            byte[] toOffer = new byte[n-8];
+                            System.arraycopy(readByte,0,number,0,8);
+                            System.arraycopy(readByte,8,toOffer,0,n-8);
 //                            byte[] toOffer = new byte[n];
 //                            System.arraycopy(readByte,0,toOffer,0,n);
                             H264RecvQueue .offer(toOffer);
-//                            int num = byteArrayToInt(number);
-//                            Log.d(TAG, "接收序号："+ num);
-                            outputStream.write(toOffer);
+                            int num = byteArrayToInt(number);
+                            Log.d(TAG, "接收mac地址："+ num);
+//                            outputStream.write(toOffer);
                             Log.d(TAG,""+H264RecvQueue .size());
 //                            try {
 //                                Thread.sleep(5);

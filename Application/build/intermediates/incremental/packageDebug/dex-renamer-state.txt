@@ -1,4 +1,4 @@
-#Wed May 10 14:37:12 CST 2017
+#Fri May 12 10:12:21 CST 2017
 base.0=/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/transforms/dex/debug/folders/1000/1f/main
 renamed.0=classes.dex
 file.0=/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/transforms/dex/debug/folders/1000/1f/main/classes.dex

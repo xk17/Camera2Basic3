@@ -52,12 +52,8 @@ public class CameraActivity extends FragmentActivity{
         //show video fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
         showFragment = new ShowFragment();
-        fragmentManager.beginTransaction().add(R.id.showView,showFragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.videoPlay1,showFragment).commit();
         Log.d(TAG,"init codec");
-
-
-
-
 
 
         Button button = (Button)findViewById(R.id.recvH264V3);
