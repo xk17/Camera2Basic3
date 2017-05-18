@@ -21,6 +21,24 @@
     </item>
     <item
         is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/support-core-ui/25.0.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="bc7e99e8d0fc279a05aa91378530f467ad62d443">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/com.android.support-support-core-ui-25.0.1_725897f0208a4e9ba03015e722f1b0d6c9ea2146.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/support-core-utils/25.0.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="00d4c8eebf2b681073c72a26bd0849549e51c7cb">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/com.android.support-support-core-utils-25.0.1_5a1dc643d5dbbeb45736dff40b0018c20104fb87.jar" />
+    </item>
+    <item
+        is-multidex="false"
         jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/exploded-aar/com.android.support/support-v4/25.0.1/jars/classes.jar"
         jumboMode="false"
         optimize="true"
@@ -39,12 +57,48 @@
     </item>
     <item
         is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="f7ac4b327fdb9e2ee386f5adc46164927658de4b">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/com.android.support-appcompat-v7-25.0.1_235e7ad697de71eb0a9d4a17711a85b626c62ab7.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/25.0.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="772bed2d992b67b9d0327f766cc95cd63031dcd3">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/com.android.support-animated-vector-drawable-25.0.1_c14623f46cf2e083ec810403d309294cba5babe2.jar" />
+    </item>
+    <item
+        is-multidex="false"
         jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/exploded-aar/com.android.support/support-media-compat/25.0.1/jars/classes.jar"
         jumboMode="false"
         optimize="true"
         revision="25.0.2"
         sha1="6a1479afe9f1b3645e1cd9a87318976893472818">
         <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/pre-dexed/debug/com.android.support-support-media-compat-25.0.1_fd0425fc0de77036aacbb488b92f21000860419d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/support-media-compat/25.0.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="6a1479afe9f1b3645e1cd9a87318976893472818">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/com.android.support-support-media-compat-25.0.1_8249018c0f583a8161aa412293671fd4387e9506.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/support-v13/25.0.1/jars/libs/internal_impl-25.0.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="cfb91ea7c6890336890ccb42767041af6b863e32">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/internal_impl-25.0.1_6635eee03515fb07199964d8da4c3427efcc77c2.jar" />
     </item>
     <item
         is-multidex="false"
@@ -84,6 +138,15 @@
     </item>
     <item
         is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/support-core-utils/25.0.1/jars/libs/internal_impl-25.0.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="c5b7145fb34779b6639147b8f2f8dd77c0db771b">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/internal_impl-25.0.1_3376f95e3ebcc1bfa7e5b94af83bf63466fa8442.jar" />
+    </item>
+    <item
+        is-multidex="false"
         jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/exploded-aar/com.android.support/support-fragment/25.0.1/jars/libs/internal_impl-25.0.1.jar"
         jumboMode="false"
         optimize="true"
@@ -93,12 +156,66 @@
     </item>
     <item
         is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/support-media-compat/25.0.1/jars/libs/internal_impl-25.0.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="f83b00041ecfba705603fec40363416c7de69719">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/internal_impl-25.0.1_a833610b7c05a62441ecd1e0c39edbf78a0768a5.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/support-compat/25.0.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="51eba4a4dd73044f90a9d58dd7ca34adbebfcf4e">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/com.android.support-support-compat-25.0.1_7605705f5fbc0aded4459f56a6c8b1415bd1fc46.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/support-v13/25.0.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="9abf11d546d9e0ee82da86df608ced7a961b76ac">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/com.android.support-support-v13-25.0.1_48ae642a589c9475c4ac2e1a1f83d1f8900849a0.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/support-fragment/25.0.1/jars/libs/internal_impl-25.0.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="c0bd6ffb002a85b5e7cad29f8558d1cc59539679">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/internal_impl-25.0.1_3b8ae5b3c61317e1908b282452ad47bbabdfb63c.jar" />
+    </item>
+    <item
+        is-multidex="false"
         jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/exploded-aar/com.android.support/cardview-v7/25.0.1/jars/classes.jar"
         jumboMode="false"
         optimize="true"
         revision="25.0.2"
         sha1="1108575c7dc7b7f5b378b3290ac90de81a9b8830">
         <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/pre-dexed/debug/com.android.support-cardview-v7-25.0.1_aae5a80bb1b3f09490dc89f645a5394c536c5aca.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/25.0.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="b24e1c688744078e1fa833ffadf696794761bbe5">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/com.android.support-support-vector-drawable-25.0.1_4c8a59c4221c7b1310b6b2dff7557203a189be6d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/support-core-ui/25.0.1/jars/libs/internal_impl-25.0.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="e5343c9d19cb19ff55f6b268c7f3fe8c9d224f6f">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/internal_impl-25.0.1_8923c11d8799feacf2f89aebdd929332c86a19e5.jar" />
     </item>
     <item
         is-multidex="false"
@@ -138,12 +255,48 @@
     </item>
     <item
         is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/support-fragment/25.0.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="26c6eef571592c91f29e56fda0bac73321de0c92">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/com.android.support-support-fragment-25.0.1_623098b7a3893a32d528bc46e6f34ad083e6a110.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/support-v4/25.0.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/com.android.support-support-v4-25.0.1_5f7f809d9d43b9a68fddf793d3683d3c1f6f1fe5.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/cardview-v7/25.0.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="1108575c7dc7b7f5b378b3290ac90de81a9b8830">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/com.android.support-cardview-v7-25.0.1_8c82fad010d287eda63fae5651430fe12beb60f2.jar" />
+    </item>
+    <item
+        is-multidex="false"
         jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/exploded-aar/com.android.support/support-core-utils/25.0.1/jars/classes.jar"
         jumboMode="false"
         optimize="true"
         revision="25.0.2"
         sha1="00d4c8eebf2b681073c72a26bd0849549e51c7cb">
         <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/pre-dexed/debug/com.android.support-support-core-utils-25.0.1_0d21f139f010a2867befb2a035d957cf6dd7dfce.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/support-compat/25.0.1/jars/libs/internal_impl-25.0.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="3af8cc51ef7088e56f132780da8c0bd858b6a6ad">
+        <dex dex="/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/pre-dexed/debug/internal_impl-25.0.1_8a2ee1cb242496b375ce7c0e77bc79342a098b0c.jar" />
     </item>
     <item
         is-multidex="false"

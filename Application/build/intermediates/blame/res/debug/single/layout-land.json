@@ -2,5 +2,9 @@
     {
         "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/res/merged/debug/layout-land/fragment_camera2_basic.xml",
         "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/src/main/res/layout-land/fragment_camera2_basic.xml"
+    },
+    {
+        "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/res/merged/debug/layout-land/fragment_camera2_basic.xml",
+        "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/src/main/res/layout-land/fragment_camera2_basic.xml"
     }
 ]

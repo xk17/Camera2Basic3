@@ -263,7 +263,7 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
             Image image = reader.acquireNextImage();
             ImageHeight = image.getHeight();
             ImageWidth = image.getWidth();
-            Log.d(TAG, "通过image剪裁后高"+ImageHeight + "宽"+ImageWidth+""+image.getFormat());
+            Log.d(TAG, "通过image剪裁后高"+ImageHeight + "宽"+ImageWidth);
             if (isRecord == true){
                     mH264Encode.code(image);
                     Log.d(TAG, "image数据输入编码器中" + image);
@@ -447,8 +447,9 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
         // a camera and start preview from here (otherwise, we wait until the surface is ready in
         // the SurfaceTextureListener).
         if (mTextureView.isAvailable()) {
-//            Log.d(TAG,"before open:"+mTextureView.getWidth()+"  "+ mTextureView.getHeight()+"");
+            Log.d(TAG,"before open预览大小:"+mTextureView.getWidth()+"  "+ mTextureView.getHeight()+"");
             openCamera(mTextureView.getWidth(), mTextureView.getHeight());
+
         } else {
             mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
         }
@@ -490,6 +491,12 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
 
     /**
      * Sets up member variables related to camera.
+     * 设置相机的输出, 包括预览和拍照
+     *
+     * 处理流程如下:
+     * 1. 获取当前的摄像头, 并将拍照输出设置为最高画质
+     * 2. 判断显示方向和摄像头传感器方向是否一致, 是否需要旋转画面（即相机输出那里就旋转画面）
+     * 3. 获取当前显示尺寸和相机的输出尺寸, 选择最合适的预览尺寸
      *
      * @param width  The width of available size for camera preview
      * @param height The height of available size for camera preview
@@ -515,6 +522,8 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
                 }
 
                 // For still image captures, we use the largest available size.
+                //选用最高画质
+                //maxImages是ImageReader一次可以访问的最大图片数量
                 Size largest = Collections.max(
                         Arrays.asList(map.getOutputSizes(ImageFormat.YUV_420_888)),
                         new CompareSizesByArea());
@@ -522,32 +531,38 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
                 Log.d(TAG, "largest.width: " + largest.getWidth());
                 Log.d(TAG, "largest.height: " + largest.getHeight());
 
-                mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
-                        ImageFormat.YUV_420_888, /*maxImages*/3);
-
+//                mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
+//                        ImageFormat.YUV_420_888, /*maxImages*/5);
+//
 //                mImageReader.setOnImageAvailableListener(
-//                        mOnImageAvailableListener, mBackgroundHandler);
-
-                mImageReader.setOnImageAvailableListener(
-                        mOnImageAvailableListener, null);
+//                        mOnImageAvailableListener, null);
 
 
 
                 // Find out if we need to swap dimension to get the preview size relative to sensor
                 // coordinate.
+                // 获取手机目前的旋转方向(横屏还是竖屏, 对于"自然"状态下高度大于宽度的设备来说横屏是ROTATION_90
+                // 或者ROTATION_270,竖屏是ROTATION_0或者ROTATION_180)
                 int displayRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
                 //noinspection ConstantConditions
+                // 获取相机传感器的方向("自然"状态下垂直放置为0, 顺时针算起, 每次加90读)
+                // 注意, 这个参数, 是由设备的生产商来决定的, 大多数情况下, 该值为90, 以下的switch这么写
+                // 是为了配适某些特殊的手机
                 mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
                 boolean swappedDimensions = false;
                 Log.d(TAG, "displayRotation: " + displayRotation);
                 Log.d(TAG, "sensorOritentation: " + mSensorOrientation);
                 switch (displayRotation) {
+                    // ROTATION_0和ROTATION_180都是竖屏只需做同样的处理操作
+                    // 显示为竖屏时, 若传感器方向为90或者270, 则需要进行转换(标志位置true)
                     case Surface.ROTATION_0:
                     case Surface.ROTATION_180:
                         if (mSensorOrientation == 90 || mSensorOrientation == 270) {
                             swappedDimensions = true;
                         }
                         break;
+                    // ROTATION_90和ROTATION_270都是横屏只需做同样的处理操作
+                    // 显示为横屏时, 若传感器方向为0或者180, 则需要进行转换(标志位置true)
                     case Surface.ROTATION_90:
                     case Surface.ROTATION_270:
                         if (mSensorOrientation == 0 || mSensorOrientation == 180) {
@@ -557,22 +572,28 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
                     default:
                         Log.e(TAG, "Display rotation is invalid: " + displayRotation);
                 }
-
+                // 获取当前的屏幕尺寸, 放到一个点对象里
                 Point displaySize = new Point();
                 activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
+                // 旋转前的预览宽度与高度(相机给出的), 通过传进来的参数获得
                 int rotatedPreviewWidth = width;
                 int rotatedPreviewHeight = height;
+                // 将当前的显示尺寸赋给最大的预览尺寸(能够显示的尺寸, 用来计算用的(texture可能比它小需要配适))
                 int maxPreviewWidth = displaySize.x;
                 int maxPreviewHeight = displaySize.y;
                 Log.d(TAG, "当前显示屏幕尺寸赋给预览maxPreviewWidth: "+maxPreviewWidth);
                 Log.d(TAG, "当前显示屏幕尺寸赋给预览maxPreviewHeight: "+maxPreviewHeight);
-
+                // 如果需要进行画面旋转, 将宽度和高度对调
                 if (swappedDimensions) {
-                    rotatedPreviewWidth = height;
-                    rotatedPreviewHeight = width;
+//                    rotatedPreviewWidth = height;
+//                    rotatedPreviewHeight = width;
                     maxPreviewWidth = displaySize.y;
                     maxPreviewHeight = displaySize.x;
                 }
+
+                Log.d(TAG, "画面旋转导致的预览长宽对调");
+                Log.d(TAG, "real preview width: " + rotatedPreviewWidth);
+                Log.d(TAG, "real preview height: " + rotatedPreviewHeight);
 
                 if (maxPreviewWidth > MAX_PREVIEW_WIDTH) {
                     maxPreviewWidth = MAX_PREVIEW_WIDTH;
@@ -585,12 +606,15 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
                 // Danger, W.R.! Attempting to use too large a preview size could  exceed the camera
                 // bus' bandwidth limitation, resulting in gorgeous previews but the storage of
                 // garbage capture data.
+                // 自动计算出最适合的预览尺寸
+                // 第一个参数:map.getOutputSizes(SurfaceTexture.class)表示SurfaceTexture支持的尺寸List
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                         rotatedPreviewWidth, rotatedPreviewHeight, maxPreviewWidth,
                         maxPreviewHeight, largest);
 
 
                 // We fit the aspect ratio of TextureView to the size of preview we picked.
+                // 获取当前的屏幕方向
                 int orientation = getResources().getConfiguration().orientation;
                 if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     // 如果方向是横向(landscape)
@@ -601,9 +625,7 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
                     mTextureView.setAspectRatio(
                             mPreviewSize.getHeight(), mPreviewSize.getWidth());
                 }
-                Log.d(TAG, "画面旋转导致的预览长宽对调");
-                Log.d(TAG, "real preview width: " + rotatedPreviewWidth);
-                Log.d(TAG, "real preview height: " + rotatedPreviewHeight);
+
 
                 // 下面这两个是计算后的最最优previewSize=======================================
                 Log.d(TAG, "计算后最优预览大小");
@@ -616,16 +638,19 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
 
 //                mPreviewSize = new Size(width,height);
                 Log.d(TAG, " mPreviewSize " + mPreviewSize.getWidth()+mPreviewSize.getHeight());
-                mImageReader = ImageReader.newInstance(width,height,
-                        ImageFormat.YUV_420_888, /*maxImages*/5);
-//                mImageReader.setOnImageAvailableListener(
-//                        mOnImageAvailableListener, mBackgroundHandler);
+
+                sendQuene = CameraActivity.quene.getH264SendQueue();
+
+                mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(),
+                        ImageFormat.YV12, /*maxImages*/5);
+
                 mImageReader.setOnImageAvailableListener(
                         mOnImageAvailableListener, null);
-                sendQuene = CameraActivity.quene.getH264SendQueue();
 //                宽*高
 //                mH264Encode = new EncoderH264(960,540,framerate);
-                mH264Encode = new EncoderH264(480,320,framerate);
+//                mH264Encode = new EncoderH264(mPreviewSize.getWidth(),mPreviewSize.getHeight(),framerate);
+                mH264Encode = new EncoderH264(mPreviewSize.getHeight(),mPreviewSize.getWidth(),framerate);
+
 
                 Log.d(TAG, "初始化编码器成功！");
                 try {

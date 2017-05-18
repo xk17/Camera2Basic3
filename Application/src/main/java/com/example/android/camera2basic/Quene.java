@@ -27,6 +27,7 @@ public class Quene {
         return H264RecvQueue;
     }
     int totalSendcnt = 0;
+//    将编码出的数据 每1000byte作为发送队列中的一个单元，即拆分成 i*1000 + b.length%1000
     public void offerSendH264Queue(byte[] b){
         int m = b.length%1000;
         int n = b.length/1000;

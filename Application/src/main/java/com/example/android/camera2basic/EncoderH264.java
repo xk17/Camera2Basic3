@@ -38,6 +38,8 @@ public class EncoderH264 {
     int m_framerate;
     MediaFormat mOutputFormat; // member variable
     private byte[] data;
+    private byte[] transdata;
+    private byte[] rotateData;
     private Image m_image;
 
     public byte[] HeadInfo;
@@ -54,7 +56,7 @@ public class EncoderH264 {
 //        同样分辨率下，视频文件的码流越大，压缩比就越小，画面质量就越高。
         mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, imageW * imageH * 5);
         mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, m_framerate);
-        mediaFormat.setInteger(MediaFormat.KEY_ROTATION, 90);
+//        mediaFormat.setInteger(MediaFormat.KEY_ROTATION, 90);
         mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 5);
         try {
             mediaCodec = MediaCodec.createEncoderByType("video/avc");
@@ -77,6 +79,7 @@ public class EncoderH264 {
 
 //          image格式转换获得I420格式的数据
             data = getDataFromImage(image,2);
+            rotateData = yuv_rotate90(data,720,540);
 
             ByteBuffer[] inputBuffers = mediaCodec.getInputBuffers();
             ByteBuffer[] outputBuffers = mediaCodec.getOutputBuffers();
@@ -90,11 +93,16 @@ public class EncoderH264 {
                 pts = computePresentationTime(generateIndex);
                 // fill inputBuffer with valid data
                 inputBuffer.clear();
-                inputBuffer.put(data);
-                Log.d(TAG, "放入的data" + data);
-                //xk注释4／27
-//                mediaCodec.queueInputBuffer(inputBufferId, 0, data.length,pts, 1);
-                mediaCodec.queueInputBuffer(inputBufferId, 0, data.length,pts, 0);
+//                inputBuffer.put(data);
+//                Log.d(TAG, "放入的data" + data);
+                inputBuffer.put(rotateData);
+                Log.d(TAG, "放入的data" + rotateData);
+
+
+//                mediaCodec.queueInputBuffer(inputBufferId, 0, data.length,pts, 0);
+//                mediaCodec.queueInputBuffer(inputBufferId, 0, transdata.length,pts, 0);
+                mediaCodec.queueInputBuffer(inputBufferId, 0, rotateData.length,pts, 0);
+
 
                 generateIndex += 1;
                 Log.d(TAG, "放入数据成功");
@@ -212,15 +220,16 @@ public class EncoderH264 {
     private static boolean isImageFormatSupported(Image image) {
         int format = image.getFormat();
 //        测试格式为35，即YUV_420_888
-//        Log.d(TAG, format + "");
+         Log.d(TAG, "ImageFormat"+format);
         switch (format) {
-            case ImageFormat.YUV_420_888:
-            case ImageFormat.NV21:
+//            case ImageFormat.YUV_420_888:
+//            case ImageFormat.NV21:
             case ImageFormat.YV12:
+                Log.d(TAG, "isImageFormatSupported");
                 return true;
         }
-        return false;
-    }
+            return false;
+        }
 
 // 设置参数colorFormat把Image转换成NV21（参数为2）或I420（参数为1）格式，数据为byte型
     private static byte[] getDataFromImage(Image image, int colorFormat) {
@@ -235,11 +244,14 @@ public class EncoderH264 {
         int width = crop.width();
         int height = crop.height();
         Image.Plane[] planes = image.getPlanes();
+        Log.d(TAG, "getDataSizeWidth * Height"+ width + "*" +height);
         byte[] data = new byte[width * height * ImageFormat.getBitsPerPixel(format) / 8];
         byte[] rowData = new byte[planes[0].getRowStride()];
         if (true) Log.v(TAG, "get data from " + planes.length + " planes");
         int channelOffset = 0;
         int outputStride = 1;
+        //channelOffset指分别将每个分量数据写入到byte[]中时的初始偏移量
+        //outputStride则是专门为NV21准备的，用来指定写入数据的间隔，即步长
         for (int i = 0; i < planes.length; i++) {
             switch (i) {
                 case 0:
@@ -251,7 +263,8 @@ public class EncoderH264 {
                         channelOffset = width * height;
                         outputStride = 1;
                     } else if (colorFormat == COLOR_FormatNV21) {
-                        channelOffset = width * height + 1;
+//                        channelOffset = width * height + 1;
+                        channelOffset = width * height;
                         outputStride = 2;
                     }
                     break;
@@ -260,14 +273,17 @@ public class EncoderH264 {
                         channelOffset = (int) (width * height * 1.25);
                         outputStride = 1;
                     } else if (colorFormat == COLOR_FormatNV21) {
-                        channelOffset = width * height;
+//                        channelOffset = width * height;
+                        channelOffset = width * height + 1 ;
                         outputStride = 2;
                     }
                     break;
             }
+
             ByteBuffer buffer = planes[i].getBuffer();
             int rowStride = planes[i].getRowStride();
             int pixelStride = planes[i].getPixelStride();
+
             if (true) {
                 Log.v(TAG, "pixelStride " + pixelStride);
                 Log.v(TAG, "rowStride " + rowStride);
@@ -275,10 +291,12 @@ public class EncoderH264 {
                 Log.v(TAG, "height " + height);
                 Log.v(TAG, "buffer size " + buffer.remaining());
             }
+
             int shift = (i == 0) ? 0 : 1;
             int w = width >> shift;
             int h = height >> shift;
             buffer.position(rowStride * (crop.top >> shift) + pixelStride * (crop.left >> shift));
+            Log.d(TAG, "crop.top*left"+crop.top + "*" + crop.left);
             for (int row = 0; row < h; row++) {
                 int length;
                 if (pixelStride == 1 && outputStride == 1) {
@@ -297,9 +315,66 @@ public class EncoderH264 {
                     buffer.position(buffer.position() + rowStride - length);
                 }
             }
+
             if (true) Log.v(TAG, "Finished reading data from plane " + i);
+            Log.d(TAG, "data的大小"+data.length);
         }
         return data;
     }
 
+    private byte[] swapYV12toI420(byte[] yv12bytes, int width, int height) {
+        byte[] i420bytes = new byte[yv12bytes.length];
+        for (int i = 0; i < width*height; i++)
+            i420bytes[i] = yv12bytes[i];
+        for (int i = width*height; i < width*height + (width/2*height/2); i++)
+            i420bytes[i] = yv12bytes[i + (width/2*height/2)];
+        for (int i = width*height + (width/2*height/2); i < width*height + 2*(width/2*height/2); i++)
+            i420bytes[i] = yv12bytes[i - (width/2*height/2)];
+        return i420bytes;
+    }
+
+
+    private byte[] yuv_rotate90(byte[] src,int width,int height){
+        byte[]des = new byte[src.length];
+        int wh = width * height;
+        //旋转Y
+        int k = 0;
+        for(int i=0;i<width;i++) {
+            for(int j=0;j<height;j++)
+            {
+                des[k] = src[width*j + i];
+                k++;
+            }
+        }
+
+        for(int i=0;i<width;i+=2) {
+            for(int j=0;j<height/2;j++)
+            {
+                des[k] = src[wh+ width*j + i];
+                des[k+1]=src[wh + width*j + i+1];
+                k+=2;
+            }
+        }
+//        int n = 0;
+//        int hw = width/2;
+//        int hh = height/2;
+//        //copy y
+//        for(int j = 0; j < width;j++)
+//        {
+//            for(int i = height - 1; i >= 0; i--)
+//            {
+//                des[n++] = src[width * i + j];
+//            }
+//        }
+//
+//        byte[]temp = src + wh;
+//        for(int j = 0;j < hw;j++)
+//        {
+//            for(int i = hh - 1;i >= 0;i--)
+//            {
+//                des[n++] = temp[ hw*i + j ];
+//            }
+//        }
+        return des;
+    }
 }

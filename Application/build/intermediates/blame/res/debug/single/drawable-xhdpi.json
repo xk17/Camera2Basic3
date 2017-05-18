@@ -1,5 +1,13 @@
 [
     {
+        "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/res/merged/debug/drawable-xhdpi/ic_launcher.png",
+        "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/src/main/res/drawable-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/res/merged/debug/drawable-xhdpi/ic_action_info.png",
+        "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/src/main/res/drawable-xhdpi/ic_action_info.png"
+    },
+    {
         "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/res/merged/debug/drawable-xhdpi/ic_action_info.png",
         "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/src/main/res/drawable-xhdpi/ic_action_info.png"
     },

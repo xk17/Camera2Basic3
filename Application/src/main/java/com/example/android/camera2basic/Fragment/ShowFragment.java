@@ -75,16 +75,15 @@ public class ShowFragment extends Fragment implements View.OnClickListener{
     }
 
     private MediaCodec mPlayCodec;
-    private int Video_Width = 500;
-    private int Video_Height = 300;
+    private int Video_Width = 540;
+    private int Video_Height = 720;
+//    private int Video_Width = 720;
+//    private int Video_Height = 540;
     private int PlayFrameRate = 12;
     private Boolean isUsePpsAndSps = false;
     private SurfaceView mPlaySurface = null;
     private SurfaceHolder mPlaySurfaceHolder;
     public void initMediaCodec(){
-
-//        CameraActivity v3 = (CameraActivity) getActivity();
-//        mPlaySurface = (SurfaceView) v3.findViewById(R.id.videoPlay1);
 
         mPlaySurfaceHolder = mPlaySurface.getHolder();
         //回调函数来啦
@@ -98,7 +97,7 @@ public class ShowFragment extends Fragment implements View.OnClickListener{
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                //初始化编码器
+                //初始化解码器
                 final MediaFormat mediaformat = MediaFormat.createVideoFormat("video/avc", Video_Width, Video_Height);
 
                 //获取h264中的pps及sps数据
