@@ -1,7 +1,6 @@
 package com.example.android.camera2basic.Fragment;
 
 import android.content.Context;
-import android.media.Image;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
@@ -10,23 +9,23 @@ import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.util.SparseIntArray;
 import android.view.LayoutInflater;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.android.camera2basic.CameraActivity;
-import com.example.android.camera2basic.Quene;
 import com.example.android.camera2basic.R;
+import com.example.android.camera2basic.TCP.Stream;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -35,23 +34,37 @@ import java.util.concurrent.BlockingQueue;
 
 public class ShowFragment extends Fragment implements View.OnClickListener{
     private final String TAG = "ShowFragment";
-
-//    CameraActivity mainAC;
-    private Quene quene;
+    private ArrayList<Stream> streams;
+    private int order;
     private BlockingQueue<byte[]> H264RecvQueue;
+    private boolean logFlag = true;
+    private boolean isPlay = false;
+    private boolean isMatch = true;
+
     public ShowFragment(){
-        quene = CameraActivity.quene;
-        H264RecvQueue  = quene.getH264RecvQueue();
+
+    }
+    public static ShowFragment newInstance(int i){
+        ShowFragment showFragment = new ShowFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("order",i);
+        showFragment.setArguments(bundle);
+        return showFragment;
     }
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 //        super.onCreateView(inflater, container, savedInstanceState);
+        streams = CameraActivity.streams;
+        order = getArguments().getInt("order");
+        new Thread(new matchThread()).start();
         return inflater.inflate(R.layout.fragment_video_show, container, false);
     }
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mPlaySurface = (SurfaceView) view.findViewById(R.id.videoSurfaceView);
+        textNumber = (TextView)view.findViewById(R.id.textView);
+
     }
 
     @Override
@@ -65,6 +78,7 @@ public class ShowFragment extends Fragment implements View.OnClickListener{
         super.onStart();
 
         initMediaCodec();
+
 
     }
 
@@ -82,9 +96,10 @@ public class ShowFragment extends Fragment implements View.OnClickListener{
     private int PlayFrameRate = 12;
     private Boolean isUsePpsAndSps = false;
     private SurfaceView mPlaySurface = null;
+    private TextView textNumber = null;
     private SurfaceHolder mPlaySurfaceHolder;
     public void initMediaCodec(){
-
+//        textNumber.setText(order);
         mPlaySurfaceHolder = mPlaySurface.getHolder();
         //回调函数来啦
         mPlaySurfaceHolder.addCallback(new SurfaceHolder.Callback(){
@@ -120,12 +135,6 @@ public class ShowFragment extends Fragment implements View.OnClickListener{
             public void surfaceDestroyed(SurfaceHolder holder) {}
         });
     }
-    private boolean isPlay = false;
-    public void startPlay(){
-        isPlay = true;
-//        new decodeH2Thread().start();
-        new Thread(new decodeH264Thread()).start();
-    }
 
     private long computePresentationTime(long frameIndex) {
         return 132 + frameIndex * 1000000/ 24;
@@ -138,17 +147,50 @@ public class ShowFragment extends Fragment implements View.OnClickListener{
 
     }
 
+    private class matchThread implements Runnable{
+
+        @Override
+        public void run() {
+            while(isMatch){
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (streams.size() >= order){
+                    H264RecvQueue = streams.get(order - 1).quene.getH264RecvQueue();
+                    if (H264RecvQueue != null) {
+                        isPlay = true;
+                        if (logFlag){
+                            Log.d(TAG, "run: " + order+ " 号stream与Fragment配对成功");
+                        }
+                        new Thread(new decodeH264Thread()).start();
+                        isMatch = false;
+                    }
+                }
+            }
+        }
+    }
+
     private class decodeH264Thread implements Runnable{
         @Override
         public void run() {
-
             try {
-                Log.d(TAG, "进入解码线程");
-                createFile();
+//                createFile();
+                while (!isPlay);
+//                {
+//                    try {
+//                        Thread.sleep(500);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+                Log.d(TAG, order+"号解码线程进入");
                 decodeLoop();
             } catch (Exception e) {
-                Log.d(TAG, "decodeLoop error");
+                Log.d(TAG, "decodeLoop error"+order);
             }
+
 
 
         }
@@ -162,7 +204,7 @@ public class ShowFragment extends Fragment implements View.OnClickListener{
 
 
             MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-            long startMs = System.currentTimeMillis();
+//            long startMs = System.currentTimeMillis();
             long timeoutUs = 10000;
 
                 while (true){
@@ -171,21 +213,20 @@ public class ShowFragment extends Fragment implements View.OnClickListener{
                         ByteBuffer byteBuffer = mPlayCodec.getInputBuffer(inIndex);
 //                        ByteBuffer byteBuffer = inputBuffers[inIndex];
                         byteBuffer.clear();
-
                         //队列获取文件数据
                         byte[] b = getOneNalu();
                         if (b!=null){
                             try{
                                 byteBuffer.put(b);
-                                Log.d(TAG, "放入一桢数据成功");
-                                Thread.sleep(30);
+                                Log.d(TAG, order+"号解码器放入一桢数据成功");
+                                Thread.sleep(10);
                             }catch (InterruptedException e){}
                         } else {
-                            Log.d(TAG, "从接收队列获得一帧数据为空");
+                            Log.d(TAG, order+"接收队列:空");
                             byte[] dummyFrame = new byte[]{0x00, 0x00, 0x01, 0x20};
                             byteBuffer.put(dummyFrame);
                             mPlayCodec.queueInputBuffer(inIndex, 0, dummyFrame.length, 0, 0);
-                            Log.d(TAG, "放入空白帧数据成功");
+//                            Log.d(TAG, "放入空白帧数据成功");
                         }
 
                         //在给指定Index的inputbuffer[]填充数据后，调用这个函数把数据传给解码器
@@ -196,22 +237,13 @@ public class ShowFragment extends Fragment implements View.OnClickListener{
                         continue;
                     }
                     int outIndex = mPlayCodec.dequeueOutputBuffer(info, timeoutUs);
-                    if (outIndex >= 0) {
-//                        while (info.presentationTimeUs / 1000 > System.currentTimeMillis() - startMs) {
-//                            try {
-//                                Thread.sleep(100);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-
+                    while(outIndex >= 0) {
                         boolean doRender = (info.size != 0);
                         mPlayCodec.releaseOutputBuffer(outIndex, doRender);
-                    } else {
-                        Log.d(TAG, "获得解码输出的数据单元为空");
+                        Log.d(TAG, order+"解码输出");
+                        outIndex = mPlayCodec.dequeueOutputBuffer(info, timeoutUs);
                     }
                 }
-//                mStopFlag = true;
             }
 
         }
@@ -240,7 +272,7 @@ public class ShowFragment extends Fragment implements View.OnClickListener{
         if (n <= 0){
             return null;
         }
-        Log.d(TAG,"获得数据queue size"+ H264RecvQueue.size());
+//        Log.d(TAG,order+"接收队列大小"+ H264RecvQueue.size());
         byte[] naluu = new byte[n-currentBuffStart];
         System.arraycopy(currentBuff, currentBuffStart, naluu, 0, n-currentBuffStart);
 
@@ -255,6 +287,8 @@ public class ShowFragment extends Fragment implements View.OnClickListener{
     //added by deonew
     private int nextNaluHead = -1;
     public int getNextIndex()  {
+//        int order = i-1;
+//        H264RecvQueue = streams.get(order).quene.getH264RecvQueue();
         //int nextNaluHead;
         nextNaluHead = getNextIndexOnce();
 
@@ -263,13 +297,11 @@ public class ShowFragment extends Fragment implements View.OnClickListener{
 
         while(nextNaluHead == -1) {
             if (H264RecvQueue.isEmpty()){
-                Log.d(TAG,"queue empty");
+//                Log.d(TAG,order+"号接收队列为空");
 //                break;
             } else {
                 byte[] tmp =H264RecvQueue.poll();
-                Log.d(TAG,"获得接收队列中的数据");
-//            4/28 12：00 新增 接收队列输出写入文件并发给解码器
-
+//                Log.d(TAG,order+"号接收队列中的数据");
 //            try {
 //                outputStream.write(tmp);
 //            } catch (IOException e) {
@@ -282,7 +314,6 @@ public class ShowFragment extends Fragment implements View.OnClickListener{
             nextNaluHead = getNextIndexOnce();
              }
             cnt++;
-//            Log.d(TAG,"poll"+cnt);
         }
         nextNaluHead = nextNaluHead - 3;
         // currentBuffStart = nextNaluHead;

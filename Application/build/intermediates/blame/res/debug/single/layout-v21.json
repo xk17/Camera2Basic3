@@ -4,8 +4,16 @@
         "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/layout-v21/notification_template_custom_big.xml"
     },
     {
+        "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic3/Application/build/intermediates/res/merged/debug/layout-v21/notification_action_tombstone.xml",
+        "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic3/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/layout-v21/notification_action_tombstone.xml"
+    },
+    {
         "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/res/merged/debug/layout-v21/notification_template_icon_group.xml",
         "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/layout-v21/notification_template_icon_group.xml"
+    },
+    {
+        "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic3/Application/build/intermediates/res/merged/debug/layout-v21/notification_template_icon_group.xml",
+        "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic3/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/layout-v21/notification_template_icon_group.xml"
     },
     {
         "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/res/merged/debug/layout-v21/notification_template_custom_big.xml",
@@ -20,6 +28,18 @@
         "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/layout-v21/notification_action.xml"
     },
     {
+        "merged": "/Users/xuke/Desktop/Camera2Basic 3/Application/build/intermediates/res/merged/debug/layout-v21/notification_template_icon_group.xml",
+        "source": "/Users/xuke/Desktop/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/layout-v21/notification_template_icon_group.xml"
+    },
+    {
+        "merged": "/Users/xuke/Desktop/Camera2Basic 3/Application/build/intermediates/res/merged/debug/layout-v21/notification_template_custom_big.xml",
+        "source": "/Users/xuke/Desktop/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/layout-v21/notification_template_custom_big.xml"
+    },
+    {
+        "merged": "/Users/xuke/Desktop/Camera2Basic 3/Application/build/intermediates/res/merged/debug/layout-v21/notification_action.xml",
+        "source": "/Users/xuke/Desktop/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/layout-v21/notification_action.xml"
+    },
+    {
         "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/res/merged/debug/layout-v21/notification_action_tombstone.xml",
         "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/layout-v21/notification_action_tombstone.xml"
     },
@@ -28,7 +48,19 @@
         "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/layout-v21/notification_action_tombstone.xml"
     },
     {
+        "merged": "/Users/xuke/Desktop/Camera2Basic 3/Application/build/intermediates/res/merged/debug/layout-v21/notification_action_tombstone.xml",
+        "source": "/Users/xuke/Desktop/Camera2Basic 3/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/layout-v21/notification_action_tombstone.xml"
+    },
+    {
         "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/res/merged/debug/layout-v21/notification_action.xml",
         "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/layout-v21/notification_action.xml"
+    },
+    {
+        "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic3/Application/build/intermediates/res/merged/debug/layout-v21/notification_template_custom_big.xml",
+        "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic3/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/layout-v21/notification_template_custom_big.xml"
+    },
+    {
+        "merged": "/Users/xuke/Documents/androidStudioProject/Camera2Basic3/Application/build/intermediates/res/merged/debug/layout-v21/notification_action.xml",
+        "source": "/Users/xuke/Documents/androidStudioProject/Camera2Basic3/Application/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/layout-v21/notification_action.xml"
     }
 ]

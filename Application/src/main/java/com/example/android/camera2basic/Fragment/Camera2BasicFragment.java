@@ -73,13 +73,13 @@ import java.util.concurrent.TimeUnit;
 
 public class Camera2BasicFragment extends Fragment implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback {
 
-    public boolean isRecord = false;
+    public static boolean isRecord = false;
 
-    public void startRecord(){
+    public static void startRecord(){
         isRecord = true;
     }
 
-    private BlockingQueue sendQuene;
+//    private BlockingQueue sendQuene;
     /**
      * Conversion from screen rotation to JPEG orientation.
      */
@@ -263,10 +263,10 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
             Image image = reader.acquireNextImage();
             ImageHeight = image.getHeight();
             ImageWidth = image.getWidth();
-            Log.d(TAG, "通过image剪裁后高"+ImageHeight + "宽"+ImageWidth);
+//            Log.d(TAG, "通过image剪裁后高"+ImageHeight + "宽"+ImageWidth);
             if (isRecord == true){
                     mH264Encode.code(image);
-                    Log.d(TAG, "image数据输入编码器中" + image);
+//                    Log.d(TAG, "image数据输入编码器中" + image);
             }else {
                 image.close();
             }
@@ -447,7 +447,7 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
         // a camera and start preview from here (otherwise, we wait until the surface is ready in
         // the SurfaceTextureListener).
         if (mTextureView.isAvailable()) {
-            Log.d(TAG,"before open预览大小:"+mTextureView.getWidth()+"  "+ mTextureView.getHeight()+"");
+//            Log.d(TAG,"before open预览大小:"+mTextureView.getWidth()+"  "+ mTextureView.getHeight()+"");
             openCamera(mTextureView.getWidth(), mTextureView.getHeight());
 
         } else {
@@ -528,16 +528,8 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
                         Arrays.asList(map.getOutputSizes(ImageFormat.YUV_420_888)),
                         new CompareSizesByArea());
 
-                Log.d(TAG, "largest.width: " + largest.getWidth());
-                Log.d(TAG, "largest.height: " + largest.getHeight());
-
-//                mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
-//                        ImageFormat.YUV_420_888, /*maxImages*/5);
-//
-//                mImageReader.setOnImageAvailableListener(
-//                        mOnImageAvailableListener, null);
-
-
+//                Log.d(TAG, "largest.width: " + largest.getWidth());
+//                Log.d(TAG, "largest.height: " + largest.getHeight());
 
                 // Find out if we need to swap dimension to get the preview size relative to sensor
                 // coordinate.
@@ -550,8 +542,8 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
                 // 是为了配适某些特殊的手机
                 mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
                 boolean swappedDimensions = false;
-                Log.d(TAG, "displayRotation: " + displayRotation);
-                Log.d(TAG, "sensorOritentation: " + mSensorOrientation);
+//                Log.d(TAG, "displayRotation: " + displayRotation);
+//                Log.d(TAG, "sensorOritentation: " + mSensorOrientation);
                 switch (displayRotation) {
                     // ROTATION_0和ROTATION_180都是竖屏只需做同样的处理操作
                     // 显示为竖屏时, 若传感器方向为90或者270, 则需要进行转换(标志位置true)
@@ -570,7 +562,7 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
                         }
                         break;
                     default:
-                        Log.e(TAG, "Display rotation is invalid: " + displayRotation);
+//                        Log.e(TAG, "Display rotation is invalid: " + displayRotation);
                 }
                 // 获取当前的屏幕尺寸, 放到一个点对象里
                 Point displaySize = new Point();
@@ -581,8 +573,8 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
                 // 将当前的显示尺寸赋给最大的预览尺寸(能够显示的尺寸, 用来计算用的(texture可能比它小需要配适))
                 int maxPreviewWidth = displaySize.x;
                 int maxPreviewHeight = displaySize.y;
-                Log.d(TAG, "当前显示屏幕尺寸赋给预览maxPreviewWidth: "+maxPreviewWidth);
-                Log.d(TAG, "当前显示屏幕尺寸赋给预览maxPreviewHeight: "+maxPreviewHeight);
+//                Log.d(TAG, "当前显示屏幕尺寸赋给预览maxPreviewWidth: "+maxPreviewWidth);
+//                Log.d(TAG, "当前显示屏幕尺寸赋给预览maxPreviewHeight: "+maxPreviewHeight);
                 // 如果需要进行画面旋转, 将宽度和高度对调
                 if (swappedDimensions) {
 //                    rotatedPreviewWidth = height;
@@ -591,9 +583,9 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
                     maxPreviewHeight = displaySize.x;
                 }
 
-                Log.d(TAG, "画面旋转导致的预览长宽对调");
-                Log.d(TAG, "real preview width: " + rotatedPreviewWidth);
-                Log.d(TAG, "real preview height: " + rotatedPreviewHeight);
+//                Log.d(TAG, "画面旋转导致的预览长宽对调");
+//                Log.d(TAG, "real preview width: " + rotatedPreviewWidth);
+//                Log.d(TAG, "real preview height: " + rotatedPreviewHeight);
 
                 if (maxPreviewWidth > MAX_PREVIEW_WIDTH) {
                     maxPreviewWidth = MAX_PREVIEW_WIDTH;
@@ -628,9 +620,9 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
 
 
                 // 下面这两个是计算后的最最优previewSize=======================================
-                Log.d(TAG, "计算后最优预览大小");
-                Log.d(TAG, "mPreviewSize.getWidth: " + mPreviewSize.getWidth());
-                Log.d(TAG, "mPreviewSize.getHeight: " + mPreviewSize.getHeight());
+//                Log.d(TAG, "计算后最优预览大小");
+//                Log.d(TAG, "mPreviewSize.getWidth: " + mPreviewSize.getWidth());
+//                Log.d(TAG, "mPreviewSize.getHeight: " + mPreviewSize.getHeight());
                 // Check if the flash is supported.
                 Boolean available = characteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
                 mFlashSupported = available == null ? false : available;
@@ -639,18 +631,12 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
 //                mPreviewSize = new Size(width,height);
                 Log.d(TAG, " mPreviewSize " + mPreviewSize.getWidth()+mPreviewSize.getHeight());
 
-                sendQuene = CameraActivity.quene.getH264SendQueue();
-
                 mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(),
                         ImageFormat.YV12, /*maxImages*/5);
-
-                mImageReader.setOnImageAvailableListener(
-                        mOnImageAvailableListener, null);
 //                宽*高
 //                mH264Encode = new EncoderH264(960,540,framerate);
 //                mH264Encode = new EncoderH264(mPreviewSize.getWidth(),mPreviewSize.getHeight(),framerate);
                 mH264Encode = new EncoderH264(mPreviewSize.getHeight(),mPreviewSize.getWidth(),framerate);
-
 
                 Log.d(TAG, "初始化编码器成功！");
                 try {
@@ -658,6 +644,13 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
+
+                mImageReader.setOnImageAvailableListener(
+                        mOnImageAvailableListener, null);
+
+
+
+
 
                 mCameraId = cameraId;
                 return;
@@ -847,28 +840,7 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
 
     @Override
     public void onClick(View view) {
-//        switch (view.getId()) {
-//            case R.id.picture: {
-//                break;
-//            }
-//            case R.id.info: {
-//                Activity activity = getActivity();
-//                if (null != activity) {
-//                    new AlertDialog.Builder(activity)
-//                            .setMessage(R.string.intro_message)
-//                            .setPositiveButton(android.R.string.ok, null)
-//                            .show();
-//                }
-//                break;
-//            }
-//            case R.id.send: {
-//                //sendH264.startSendH264();
-//                //开始摄像并将数据写入文件中
-//                Log.d(TAG,"record");
-//                startRecord();
-//                break;
-//            }
-//        }
+
     }
 
     private void setAutoFlash(CaptureRequest.Builder requestBuilder) {

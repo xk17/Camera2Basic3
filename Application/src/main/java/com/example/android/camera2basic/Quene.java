@@ -12,6 +12,7 @@ import java.util.concurrent.BlockingQueue;
 public class Quene {
     private BlockingQueue<byte[]> H264SendQueue;
     private BlockingQueue<byte[]> H264RecvQueue;
+
     public Quene(){
         H264SendQueue = new ArrayBlockingQueue<byte[]>(10000);
         H264RecvQueue = new ArrayBlockingQueue<byte[]>(10000);
